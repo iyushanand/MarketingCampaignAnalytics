@@ -60,6 +60,8 @@ export class CampaignPerformanceComponent implements OnInit, AfterViewInit {
   searchText = '';
   selectedChannel = '';
   selectedStatus = '';
+  selectedCampaignType = '';
+  campaignTypesList: string[] = [];
 
   // Sorting
   sortBy: 'revenue' | 'roi' | 'conversionRate' | '' = '';
@@ -163,6 +165,9 @@ export class CampaignPerformanceComponent implements OnInit, AfterViewInit {
               if (!this.isDbEmpty) {
                 const channels = this.campaigns.map(c => c.marketingChannel).filter(Boolean);
                 this.channelsList = Array.from(new Set(channels));
+                
+                const types = this.campaigns.map(c => c.campaignType).filter(Boolean);
+                this.campaignTypesList = Array.from(new Set(types));
                 
                 this.calculateKpiSummaries();
                 this.calculateChannelAnalysis();
@@ -300,7 +305,9 @@ export class CampaignPerformanceComponent implements OnInit, AfterViewInit {
                            c.marketingChannel.toLowerCase() === this.selectedChannel.toLowerCase();
       const statusMatch = !this.selectedStatus || 
                           c.status.toLowerCase() === this.selectedStatus.toLowerCase();
-      return searchMatch && channelMatch && statusMatch;
+      const typeMatch = !this.selectedCampaignType ||
+                        c.campaignType.toLowerCase() === this.selectedCampaignType.toLowerCase();
+      return searchMatch && channelMatch && statusMatch && typeMatch;
     });
 
     // Apply Sorting

@@ -173,10 +173,10 @@
       <div class="card-body p-3">
         <div class="row g-3">
           <!-- Search -->
-          <div class="col-md-4">
+          <div class="col-md-3">
             <div class="input-group">
               <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-secondary"></i></span>
-              <input type="text" class="form-control border-start-0 ps-1" placeholder="Search by campaign name..." [(ngModel)]="searchText" (ngModelChange)="applyFilters()" />
+              <input type="text" class="form-control border-start-0 ps-1" placeholder="Search campaigns..." [(ngModel)]="searchText" (ngModelChange)="applyFilters()" />
             </div>
           </div>
           <!-- Channel Select -->
@@ -186,18 +186,25 @@
               <option *ngFor="let ch of channelsList" [value]="ch">{{ ch }}</option>
             </select>
           </div>
+          <!-- Campaign Type Select -->
+          <div class="col-md-2">
+            <select class="form-select" [(ngModel)]="selectedCampaignType" (change)="applyFilters()">
+              <option value="">All Types</option>
+              <option *ngFor="let type of campaignTypesList" [value]="type">{{ type }}</option>
+            </select>
+          </div>
           <!-- Status Select -->
-          <div class="col-md-3">
+          <div class="col-md-2">
             <select class="form-select" [(ngModel)]="selectedStatus" (change)="applyFilters()">
               <option value="">All Statuses</option>
               <option value="Active">Active</option>
               <option value="Completed">Completed</option>
             </select>
           </div>
-          <!-- Reset Sort -->
+          <!-- Reset Sort & Filters -->
           <div class="col-md-2 d-flex align-items-center justify-content-md-end">
-            <button *ngIf="sortBy" class="btn btn-outline-secondary btn-sm w-100" (click)="sortBy = ''; applyFilters()">
-              Clear Sorting
+            <button *ngIf="sortBy || searchText || selectedChannel || selectedCampaignType || selectedStatus" class="btn btn-outline-secondary btn-sm w-100" (click)="sortBy = ''; searchText = ''; selectedChannel = ''; selectedCampaignType = ''; selectedStatus = ''; applyFilters()">
+              Reset Filters
             </button>
           </div>
         </div>
