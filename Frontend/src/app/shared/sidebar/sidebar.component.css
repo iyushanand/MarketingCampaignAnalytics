@@ -4,3 +4,32 @@
   min-height: calc(100vh - 56px);
   background-color: #212529;
 }
+
+/* Force list group items inside the sidebar to have light-colored text and transparent backgrounds */
+.list-group-item {
+  color: rgba(255, 255, 255, 0.8) !important;
+  background-color: transparent !important;
+  border: none !important;
+  transition: all 0.15s ease-in-out;
+}
+
+.list-group-item:hover {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  text-decoration: none;
+}
+
+.list-group-item.active {
+  color: #ffffff !important;
+  background-color: #0d6efd !important; /* Bootstrap primary blue */
+  font-weight: 600;
+}
+
+/* Align icon colors */
+.list-group-item i {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.list-group-item.active i {
+  color: #ffffff !important;
+}
