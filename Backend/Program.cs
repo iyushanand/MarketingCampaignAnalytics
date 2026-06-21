@@ -19,8 +19,13 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 
-// Register Repository Pattern
+// Register Generic Repository
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
+// Register Specific Repositories
+builder.Services.AddScoped<ICampaignRepository, CampaignRepository>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<ICampaignResponseRepository, CampaignResponseRepository>();
 
 // Register Python Runner
 builder.Services.AddSingleton<PythonRunner>();
@@ -67,6 +72,11 @@ if (app.Environment.IsDevelopment())
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Marketing Campaign Analytics API v1");
     });
+
+    // Run database migrations on startup in development
+    using var scope = app.Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await DbInitializer.InitializeAsync(dbContext);
 }
 
 // Global Exception Handling Middleware
