@@ -1,0 +1,7 @@
+﻿Campaign Name,Marketing Channel,Spend,Revenue,ROI,ROAS,CTR,Conversions,Response Rate,Campaign Status
+Acquisition Campaign 1,Email,48000.00,75000.00,0.5625,1.56,0.0500,150,0.1116,Completed
+Acquisition Campaign 2,SMS,28000.00,45000.00,0.6071,1.61,0.0500,90,0.0000,Completed
+Retention Campaign 3,Social Media,58000.00,90000.00,0.5517,1.55,0.0500,220,0.1116,Completed
+Retention Campaign 4,Google Search Ads,39000.00,65000.00,0.6667,1.67,0.0500,130,0.2232,Completed
+Loyalty Campaign 5,Display Ads,44000.00,55000.00,0.2500,1.25,0.0500,110,0.1116,Completed
+Promo Final Campaign,Email,78000.00,130000.00,0.6667,1.67,0.0500,320,0.2188,Completed

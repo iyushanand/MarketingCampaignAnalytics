@@ -1,0 +1,115 @@
+<div class="container-fluid py-4">
+  <div class="row mb-4 align-items-center">
+    <div class="col">
+      <h2 class="h3 mb-0 text-slate-800"><i class="bi bi-bar-chart-line-fill me-2 text-primary"></i>Tableau Business Intelligence</h2>
+      <p class="text-muted mb-0 small">Export analytical datasets optimized for Tableau dashboards and executive reporting fact-tables</p>
+    </div>
+  </div>
+
+  <!-- Alert Toasts -->
+  <div *ngIf="toastMessage" class="alert border-0 shadow-sm mb-4 position-relative" [class.alert-success]="toastType === 'success'" [class.alert-danger]="toastType === 'danger'" [class.alert-warning]="toastType === 'warning'">
+    <i class="bi me-2" [class.bi-check-circle-fill]="toastType === 'success'" [class.bi-exclamation-triangle-fill]="toastType === 'warning' || toastType === 'danger'"></i>
+    <span class="small fw-semibold">{{ toastMessage }}</span>
+    <button type="button" class="btn-close position-absolute top-50 end-0 translate-middle-y me-3" aria-label="Close" (click)="toastMessage = ''"></button>
+  </div>
+
+  <!-- Server Saved Path Notification -->
+  <div *ngIf="exportedPath" class="alert alert-info border-0 shadow-sm mb-4">
+    <i class="bi bi-folder-check me-2"></i>
+    <span class="small">Datasets also archived on server at: <code>{{ exportedPath }}</code></span>
+  </div>
+
+  <div class="row g-4">
+    <!-- Export Panel -->
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3 border-bottom border-light d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0 fw-bold text-dark"><i class="bi bi-cloud-arrow-down-fill me-2 text-primary"></i>Export Datasets</h5>
+          <button class="btn btn-sm btn-primary fw-semibold" (click)="exportAll()" [disabled]="isLoadingAll || isLoadingCampaign || isLoadingCustomer || isLoadingSummary || isLoadingMonthly">
+            <span *ngIf="isLoadingAll" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+            Export All
+          </button>
+        </div>
+        <div class="card-body p-4">
+          <p class="text-secondary small mb-4">Export cleaned relational tables formatted for Tableau Desktop or Tableau Public. Columns are pre-scaled and pre-aligned for dimension joins.</p>
+
+          <div class="list-group list-group-flush">
+            <!-- 1. Campaign Performance -->
+            <div class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0 py-3">
+              <div>
+                <h6 class="fw-bold mb-1 text-dark">Campaign Performance</h6>
+                <p class="text-secondary small mb-0">Includes: Channel, Spend, Revenue, Conversions, CTR, ROI, Status.</p>
+              </div>
+              <button class="btn btn-sm btn-light border-light text-primary" (click)="exportCampaign()" [disabled]="isLoadingCampaign">
+                <span *ngIf="isLoadingCampaign" class="spinner-border spinner-border-sm me-1" role="status"></span>
+                <i *ngIf="!isLoadingCampaign" class="bi bi-download me-1"></i>CSV
+              </button>
+            </div>
+
+            <!-- 2. Customer Analytics -->
+            <div class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0 py-3">
+              <div>
+                <h6 class="fw-bold mb-1 text-dark">Customer Analytics</h6>
+                <p class="text-secondary small mb-0">Includes: ID, Age, Income, Education, Country, Segment, Spend, Purchases.</p>
+              </div>
+              <button class="btn btn-sm btn-light border-light text-primary" (click)="exportCustomer()" [disabled]="isLoadingCustomer">
+                <span *ngIf="isLoadingCustomer" class="spinner-border spinner-border-sm me-1" role="status"></span>
+                <i *ngIf="!isLoadingCustomer" class="bi bi-download me-1"></i>CSV
+              </button>
+            </div>
+
+            <!-- 3. Campaign Summary -->
+            <div class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0 py-3">
+              <div>
+                <h6 class="fw-bold mb-1 text-dark">Campaign Summary KPIs</h6>
+                <p class="text-secondary small mb-0">Overall KPI fact table (Total revenue, total spend, average conversion, best campaign).</p>
+              </div>
+              <button class="btn btn-sm btn-light border-light text-primary" (click)="exportSummary()" [disabled]="isLoadingSummary">
+                <span *ngIf="isLoadingSummary" class="spinner-border spinner-border-sm me-1" role="status"></span>
+                <i *ngIf="!isLoadingSummary" class="bi bi-download me-1"></i>CSV
+              </button>
+            </div>
+
+            <!-- 4. Monthly Revenue Trend -->
+            <div class="list-group-item bg-transparent d-flex justify-content-between align-items-center px-0 py-3 border-0">
+              <div>
+                <h6 class="fw-bold mb-1 text-dark">Monthly Revenue Trend</h6>
+                <p class="text-secondary small mb-0">Aggregated monthly timeline logs tracking revenue, spend, and monthly ROI trend.</p>
+              </div>
+              <button class="btn btn-sm btn-light border-light text-primary" (click)="exportMonthly()" [disabled]="isLoadingMonthly">
+                <span *ngIf="isLoadingMonthly" class="spinner-border spinner-border-sm me-1" role="status"></span>
+                <i *ngIf="!isLoadingMonthly" class="bi bi-download me-1"></i>CSV
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Instruction Panel -->
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm bg-dark text-white">
+        <div class="card-header bg-transparent py-3 border-bottom border-secondary">
+          <h5 class="card-title mb-0 fw-bold"><i class="bi bi-info-circle me-2 text-primary"></i>BI Integration Guide</h5>
+        </div>
+        <div class="card-body p-4">
+          <h6 class="fw-bold text-primary mb-3">Connecting Tableau to the CSV Data Source:</h6>
+          <ol class="small text-white-50 ps-3 mb-4" style="line-height: 1.6;">
+            <li class="mb-2">Click **Export All** to generate the CSV datasets in the project archive.</li>
+            <li class="mb-2">Open **Tableau Desktop** or **Tableau Public** on your machine.</li>
+            <li class="mb-2">Under Connect -> To a File, select **Text File**.</li>
+            <li class="mb-2">Navigate to the directory <code>Tableau/Datasets/</code> inside the project workspace and load `campaign_performance.csv`.</li>
+            <li class="mb-2">Connect other files like `customer_analytics.csv` and join them using the primary keys (e.g. customer demographics mapping) where required.</li>
+          </ol>
+
+          <h6 class="fw-bold text-primary mb-3">Executive Dashboard Metrics:</h6>
+          <ul class="list-unstyled small text-white-50 ps-0 mb-0">
+            <li class="mb-2"><i class="bi bi-check2-circle text-primary me-2"></i>**Overview Sheet**: Display sum of Revenue, sum of Spend, and calculated Portfolio ROI.</li>
+            <li class="mb-2"><i class="bi bi-check2-circle text-primary me-2"></i>**Campaign Performance**: Stacked bar chart detailing Spend vs Revenue.</li>
+            <li class="mb-2"><i class="bi bi-check2-circle text-primary me-2"></i>**Demographics**: Geographical map using Country fields joined with customer spend indices.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

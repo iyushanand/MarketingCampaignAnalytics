@@ -1,140 +1,129 @@
 # Marketing Campaign Analytics Platform
 
-An enterprise-grade, full-stack marketing measurement and customer value analytics platform. The application connects an Angular client dashboard, an ASP.NET Core Web API, a SQL Server database, and a live Python process execution engine to analyze campaign ROI, customer value segmentation, statistical significance, and real-time response prediction.
+An enterprise-grade, full-stack marketing measurement, customer segmentation, and predictive targeting system. This platform enables marketing teams and business executives to optimize ad spend, measure campaign ROI, group customers by purchase behavior, perform advanced statistical testing, and predict target response likelihoods.
+
+Designed as a professional portfolio showcase for analytical and full-stack engineering roles (e.g., **American Express AIM Analyst**, **Deloitte**, **EY**, **Accenture**), it demonstrates software engineering best practices, database performance tuning, inter-process communication, and machine learning pipeline integration.
 
 ---
 
-## 1. Project Overview
+## 🚀 Business Value & Key Capabilities
 
-Marketing teams frequently spend millions of dollars on campaigns across multiple channels (Email, SMS, Social, Search, Display) without precise clarity on which campaigns are driving true incremental conversions.
-
-This platform bridges that gap by providing:
-- **Executive KPI Tracking**: High-level financial metrics (Revenue, Spend, ROI, Conversion Rates).
-- **Campaign Performance & Comparison**: Detailed channel breakdowns and effectiveness rankings.
-- **Customer Insights**: RFM segmentation dividing customers into High, Medium, and Low Value tiers.
-- **Data Analysis & Statistics**: Exploratory Data Analysis (EDA) and automated statistical hypothesis testing (T-Test, Chi-Square, Linear Regression) with natural language business explanations.
-- **Predictive Analytics**: Real-time response forecasting powered by a Python-backed Logistic Regression classifier.
-- **Document Automation**: Dynamically generated, formatted Excel workbooks (openpyxl) and PDF briefs (reportlab).
+1.  **Executive Financial Intelligence**: Real-time tracking of critical KPIs including **Total Revenue**, **Total Spend**, **ROI Margins**, and **Conversion Rates** with visual trends over time.
+2.  **Multi-Channel Attribution**: Deep-dive analytics on marketing channels (Email, SMS, Social Media, Google Search, Display) to identify high-performing campaigns and optimize budget allocation.
+3.  **Customer RFM Segmentation**: In-memory grouping of customers into **High Value**, **Medium Value**, and **Low Value** tiers based on Recency, Frequency, and Monetary spend profiles.
+4.  **Automated Hypothesis Testing**: Advanced Python-driven statistics (Welch's T-Test, Chi-Square of Independence, and Ordinary Least Squares Linear Regression) with natural language translations of p-values for business users.
+5.  **Predictive targeting (ML)**: A machine learning pipeline utilizing a **scikit-learn Logistic Regression Classifier** to predict campaign response likelihood, complete with classification reports, confusion matrices, and ROC-AUC metrics.
+6.  **Document Automation**: Scheduled and on-demand styled Excel workbooks (featuring freeze-panes, zebra striping, conditional highlights, and native charts via `openpyxl`) and paginated executive PDF briefs (via `reportlab`).
+7.  **Tableau BI Integration**: Automatic star-schema CSV dataset exports to feed enterprise Tableau dashboards.
 
 ---
 
-## 2. Technology Stack
+## 🛠️ Technology Stack
 
-- **Frontend**: Angular 19, TypeScript, Bootstrap 5, Chart.js.
-- **Backend API**: ASP.NET Core Web API (.NET 8), Entity Framework Core (EF Core).
-- **Database**: SQL Server Express LocalDB (`MSSQLLocalDB`).
-- **Analytics Engine**: Python (Pandas, NumPy, Scikit-Learn, SciPy, StatsModels).
-- **Document Automation**: openpyxl (Excel), ReportLab (PDF).
-- **BI Layer**: Tableau Desktop (`.twb` templates).
-
----
-
-## 3. Database Schema
-
-The database utilizes SQL Server LocalDB and maps relational entities:
-
-### 1. `Customer`
-- `CustomerId` (INT, Primary Key, Identity)
-- `Age` (INT)
-- `Gender` (NVARCHAR)
-- `Income` (DECIMAL)
-- `Education` (NVARCHAR)
-- `MaritalStatus` (NVARCHAR)
-- `Country` (NVARCHAR)
-
-### 2. `Campaign`
-- `CampaignId` (INT, Primary Key, Identity)
-- `CampaignName` (NVARCHAR)
-- `Channel` (NVARCHAR)
-- `Budget` (DECIMAL)
-- `Spend` (DECIMAL)
-- `Revenue` (DECIMAL)
-- `Conversions` (INT)
-- `Clicks` (INT)
-- `Impressions` (INT)
-- `StartDate` (DATETIME)
-- `EndDate` (DATETIME)
-
-### 3. `CampaignResponse`
-- `ResponseId` (INT, Primary Key, Identity)
-- `CustomerId` (INT, Foreign Key referencing Customer)
-- `CampaignId` (INT, Foreign Key referencing Campaign)
-- `Response` (NVARCHAR)
-- `PurchaseAmount` (DECIMAL)
-- `PurchaseDate` (DATETIME)
+*   **Frontend**: Angular 19 (Standalone Components, Routing, CORS-ready client), TypeScript, Bootstrap 5, Chart.js.
+*   **Backend API**: ASP.NET Core Web API (.NET 8), Entity Framework Core (EF Core), LINQ.
+*   **Database**: SQL Server LocalDB (`MSSQLLocalDB`).
+*   **Analytics Engine**: Python (Pandas, NumPy, Scikit-Learn, SciPy, StatsModels).
+*   **Document Automation**: openpyxl (Excel), ReportLab (PDF).
+*   **BI Layer**: Tableau Public / Tableau Desktop (`.csv` export pipeline).
 
 ---
 
-## 4. Application Workflow
+## 📐 Architecture & System Flow
 
 ```text
-       [ Angular Client ]  ◄── (HTTP/CORS) ──►  [ ASP.NET Core Web API ]
-               │                                       │
-               ▼                                       ▼
-     [ Interactive Charts ]                     [ SQL Server DB ]
-     [ Forms & Predictors ]                            │ (Process Runner)
-                                                       ▼
-                                            [ Python Analytics Engine ]
-                                            (eda, stats, ml, reports)
+       [ Angular 19 Client ]
+                │
+                ▼ (CORS HTTP REST API)
+       [ ASP.NET Core Web API ] ◄──► [ SQL Server Relational DB ]
+                │
+                ▼ (Asynchronous Python Process Execution)
+       [ Python Analytics Hub ]
+        ├── eda.py (Data profiling & correlation matrices)
+        ├── statistics.py (T-test, Chi-square, Linear regression)
+        ├── machine_learning.py (Logistic Regression fit & predict)
+        └── report_generator.py (Styled Excel & PDF rendering)
 ```
 
-1. **User Action**: The user launches the Angular frontend. On first load, they can choose to load the pre-cleaned Kaggle *Customer Personality Analysis* dataset or upload their own custom CSV.
-2. **Data Aggregation**: ASP.NET Core uses Entity Framework Core and LINQ to run aggregated KPI, performance, and RFM segmentation queries directly against SQL Server.
-3. **Deep Analytics**: When the user requests statistical tests, EDA matrices, or ML models, ASP.NET Core spawns a Python subprocess, passes parameters, and captures the JSON stdout payload.
-4. **Document Export**: Downloading reports triggers a Python background process that writes clean Excel sheets (featuring conditional formatting, pivot summaries, and native charts) or styled PDFs.
+*   **Process Isolation**: ASP.NET Core manages data transactions and seeds. For computationally heavy analytical logic (ML fitting, PDFs, stats), the API spawns an isolated Python subprocess, executing scripts asynchronously, passing payload filepaths, and returning structured JSON stdout.
+*   **Performance Tuning**: Resolved classic **N+1 query issues** in Entity Framework Core by utilizing SQL aggregations and grouped memory mapping, reducing DB load from $O(N)$ query loops to $O(1)$ dictionary lookups.
+
+For deep details, review our separate documentation:
+*   📄 [architecture.md](file:///C:/Users/KIIT/.gemini/antigravity/scratch/MarketingCampaignAnalytics/architecture.md) - Layer configurations and execution workflow diagrams.
+*   📄 [database_design.md](file:///C:/Users/KIIT/.gemini/antigravity/scratch/MarketingCampaignAnalytics/database_design.md) - Entity Relationship Diagram (ERD) and relational schema mappings.
+*   📄 [api_documentation.md](file:///C:/Users/KIIT/.gemini/antigravity/scratch/MarketingCampaignAnalytics/api_documentation.md) - Swagger routes, JSON payloads, and response definitions.
+*   📄 [user_guide.md](file:///C:/Users/KIIT/.gemini/antigravity/scratch/MarketingCampaignAnalytics/user_guide.md) - Instructions for seeding, predicting, and reporting.
 
 ---
 
-## 5. Directory Structure
+## 📦 Directory Structure
 
 ```text
 MarketingCampaignAnalytics/
-├── Frontend/                         # Angular Client
+├── Frontend/                         # Angular 19 Client App
 │   ├── src/app/
-│   │   ├── components/               # All page layouts
-│   │   ├── shared/                   # Sidebar, Navbar, Footer
-│   │   ├── services/                 # ApiService
-│   │   └── models/                   # TypeScript interfaces
-├── Backend/                          # ASP.NET Core Web API
-│   ├── Controllers/                  # Endpoints (Upload, Dashboard, Reports, Analytics)
-│   ├── Models/                       # Database Entity Classes
-│   ├── DTOs/                         # Request/Response Data structures
-│   ├── Database/                     # DbContext, DbInitializer
-│   ├── Services/                     # Business services & PythonRunner
-│   ├── Middleware/                   # GlobalExceptionMiddleware
-│   └── Analytics/                    # Python core scripts
-├── Tableau/                          # Dedicated Tableau worksheets (.twb)
-├── Reports/                          # Generated download directory
-└── README.md                         # Project documentation
+│   │   ├── components/               # Dashboards, ML Target Form, Reports, BI Tabs
+│   │   ├── services/                 # ApiService (HTTP Client)
+│   │   └── models/                   # TypeScript interfaces & DTO mappings
+├── Backend/                          # ASP.NET Core Web API (.NET 8)
+│   ├── Controllers/                  # Endpoints (Reports, Tableau, Uploads, Analytics)
+│   ├── Database/                     # DbContext and DbInitializer (seeding Kaggle datasets)
+│   ├── Services/                     # C# Services (TableauExport, Reports, Predictions, PythonRunner)
+│   └── Analytics/                    # Python analytical execution scripts
+├── Tableau/                          # Dedicated Tableau Integration
+│   ├── Datasets/                     # Exported CSV star-schema data tables
+│   └── Documentation/                # Tableau data connection guides & relations
+├── docs/                             # Project assets
+│   └── screenshots/                  # Beautiful application screenshots
+└── README.md                         # Project Case Study
 ```
 
 ---
 
-## 6. How to Run (Local Setup)
+## ⚙️ How to Run Locally
 
 ### Prerequisites
-- .NET 8 SDK
-- Node.js (v20+) & Angular CLI (v17+)
-- Python (v3.10+) with pip
-- SQL Server Express LocalDB
+*   [.NET 8 SDK](https://dotnet.microsoft.com/download)
+*   [Node.js (v20+)](https://nodejs.org/) & Angular CLI
+*   [Python 3.10+](https://www.python.org/downloads/) with pip
+*   [SQL Server Express LocalDB](https://learn.microsoft.com/sql/database-engine/configure-windows/sql-server-express-localdb)
 
-### 1. Backend Setup
-1. Open PowerShell and navigate to `Backend/`.
-2. Run `dotnet restore` to restore packages.
-3. Start the API server:
-   ```bash
-   dotnet run
-   ```
-4. Confirm Swagger is running at `http://localhost:5246/swagger`.
+### 1. Backend API Configuration
+1.  Navigate to the `Backend` directory:
+    ```powershell
+    cd Backend
+    ```
+2.  Install Python packages:
+    ```powershell
+    pip install pandas numpy scikit-learn scipy statsmodels openpyxl reportlab joblib
+    ```
+3.  Ensure database connection strings and the python execution path match your local setup in `appsettings.json`.
+4.  Build and run the API server:
+    ```powershell
+    dotnet run
+    ```
+5.  Open [http://localhost:5224/swagger](http://localhost:5224/swagger) in your browser to verify Swagger endpoint documentation.
 
-### 2. Frontend Setup
-1. Navigate to `Frontend/`.
-2. Install npm dependencies:
-   ```bash
-   npm install
-   ```
-3. Run the development server:
-   ```bash
-   npm start
-   ```
-4. Open the application at `http://localhost:4200`.
+### 2. Frontend Angular App
+1.  Navigate to the `Frontend` directory:
+    ```powershell
+    cd Frontend
+    ```
+2.  Install all node modules:
+    ```powershell
+    npm install
+    ```
+3.  Launch the development server:
+    ```powershell
+    npm start
+    ```
+4.  Access the platform dashboard at [http://localhost:4200](http://localhost:4200).
+
+---
+
+## 📊 Key Highlights for Recruiting Managers
+
+*   **American Express AIM Role Alignment**: Features industry-standard RFM modeling, campaign ROI measurement, and response scoring. Showcases an understanding of budget-optimal targeting (Logistic Regression coefficients and precision-oriented threshold tuning).
+*   **Advanced ML Pipeline**: The Logistic Regression classifier runs custom categorical One-Hot Encoding and Standard Scaling. Model coefficients are evaluated to provide business-level rationales (e.g., "Customer average spend is above the market average, increasing response probability").
+*   **Production-Grade Stability**: Includes a global API exception handling middleware, explicit database transactional constraints, and asynchronous thread-safe process managers preventing memory leakage.
+*   **Zero-Warning Build Quality**: Code compiles with zero warnings or type compiler flags on both .NET 8 and Angular 19 platforms.

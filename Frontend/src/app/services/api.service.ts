@@ -13,7 +13,8 @@ import {
   PredictionResponse,
   PredictionMetrics,
   CampaignDto,
-  CustomerDto
+  CustomerDto,
+  ReportFileDto
 } from '../models/types';
 
 // Let's add ApiResponse definition directly to make it self-contained
@@ -97,12 +98,44 @@ export class ApiService {
     return this.http.get<any[]>(`${this.apiUrl}/reports/${reportType}`);
   }
 
-  downloadExcelReport(): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/report/download/excel`, { responseType: 'blob' });
+  getReportsList(): Observable<ApiResponseWrapper<ReportFileDto[]>> {
+    return this.http.get<ApiResponseWrapper<ReportFileDto[]>>(`${this.apiUrl}/reports/list`);
   }
 
-  downloadPdfReport(): Observable<Blob> {
-    return this.http.get(`${this.apiUrl}/report/download/pdf`, { responseType: 'blob' });
+  generateExcelReport(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/reports/excel`, { responseType: 'blob' });
+  }
+
+  generatePdfReport(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/reports/pdf`, { responseType: 'blob' });
+  }
+
+  downloadArchivedReport(fileName: string): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/reports/download`, {
+      params: { fileName },
+      responseType: 'blob'
+    });
+  }
+
+  // Tableau BI Export APIs
+  exportTableauCampaign(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/tableau/export/campaign`, { responseType: 'blob' });
+  }
+
+  exportTableauCustomer(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/tableau/export/customer`, { responseType: 'blob' });
+  }
+
+  exportTableauSummary(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/tableau/export/summary`, { responseType: 'blob' });
+  }
+
+  exportTableauMonthly(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/tableau/export/monthly`, { responseType: 'blob' });
+  }
+
+  exportTableauAll(): Observable<ApiResponseWrapper<string>> {
+    return this.http.get<ApiResponseWrapper<string>>(`${this.apiUrl}/tableau/export/all`);
   }
 
   // Phase 9 Response Prediction (Logistic Regression) APIs

@@ -1,0 +1,7 @@
+/* Styles for Business Intelligence Panel */
+.list-group-item {
+  transition: background-color 0.2s ease-in-out;
+}
+.list-group-item:hover {
+  background-color: rgba(0, 0, 0, 0.02) !important;
+}

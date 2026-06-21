@@ -11,6 +11,7 @@ import { ResponsePredictionComponent } from './components/response-prediction/re
 import { RoiCalculatorComponent } from './components/roi-calculator/roi-calculator.component';
 import { ReportsComponent } from './components/reports/reports.component';
 import { UploadDatasetComponent } from './components/upload-dataset/upload-dataset.component';
+import { BusinessIntelligenceComponent } from './components/business-intelligence/business-intelligence.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -25,6 +26,7 @@ export const routes: Routes = [
   { path: 'response-prediction', component: ResponsePredictionComponent },
   { path: 'roi-calculator', component: RoiCalculatorComponent },
   { path: 'reports', component: ReportsComponent },
+  { path: 'business-intelligence', component: BusinessIntelligenceComponent },
   { path: 'upload-dataset', component: UploadDatasetComponent },
   { path: '**', redirectTo: 'dashboard' }
 ];

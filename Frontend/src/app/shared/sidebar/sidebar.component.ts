@@ -22,6 +22,7 @@ export class SidebarComponent {
     { label: 'Response Prediction', path: '/response-prediction', icon: 'bi bi-magic' },
     { label: 'ROI Calculator', path: '/roi-calculator', icon: 'bi bi-cash-coin' },
     { label: 'Reports', path: '/reports', icon: 'bi bi-download' },
+    { label: 'Business Intelligence', path: '/business-intelligence', icon: 'bi bi-bar-chart-line-fill' },
     { label: 'Upload Dataset', path: '/upload-dataset', icon: 'bi bi-cloud-arrow-up-fill' }
   ];
 }

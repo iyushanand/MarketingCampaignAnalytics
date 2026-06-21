@@ -1,8 +1,102 @@
-<div class="container-fluid py-4 text-center">
-  <div class="py-5 bg-white rounded shadow-sm border border-light">
-    <i class="bi bi-download text-secondary fs-1 mb-3 d-block"></i>
-    <h3 class="fw-bold text-dark">Excel & PDF Reports Export</h3>
-    <p class="text-secondary small mb-4">Download automated openpyxl workbooks with pivot charts and reportlab executive summaries.</p>
-    <span class="badge bg-secondary px-3 py-2 fs-6">Coming in Phase 9 (Document Automation & Exports)</span>
+<div class="container-fluid py-4">
+  <div class="row mb-4 align-items-center">
+    <div class="col">
+      <h2 class="h3 mb-0 text-slate-800"><i class="bi bi-download me-2 text-primary"></i>Marketing Reports Export</h2>
+      <p class="text-muted mb-0 small">Download automated openpyxl workbooks with pivot charts and reportlab executive summaries</p>
+    </div>
+  </div>
+
+  <!-- Alert Toasts -->
+  <div *ngIf="toastMessage" class="alert border-0 shadow-sm mb-4 position-relative" [class.alert-success]="toastType === 'success'" [class.alert-danger]="toastType === 'danger'" [class.alert-warning]="toastType === 'warning'">
+    <i class="bi me-2" [class.bi-check-circle-fill]="toastType === 'success'" [class.bi-exclamation-triangle-fill]="toastType === 'warning' || toastType === 'danger'"></i>
+    <span class="small fw-semibold">{{ toastMessage }}</span>
+    <button type="button" class="btn-close position-absolute top-50 end-0 translate-middle-y me-3" aria-label="Close" (click)="toastMessage = ''"></button>
+  </div>
+
+  <div class="row g-4">
+    <!-- Generation Control Card -->
+    <div class="col-lg-5">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white py-3 border-bottom border-light">
+          <h5 class="card-title mb-0 fw-bold text-dark"><i class="bi bi-gear-fill me-2 text-primary"></i>Report Console</h5>
+        </div>
+        <div class="card-body p-4 d-flex flex-column justify-content-center">
+          <p class="text-secondary small mb-4">Click below to query SQL Server and generate native, formatted, production-quality analytical documents.</p>
+          
+          <button class="btn btn-primary btn-lg mb-3 py-3 fw-semibold d-flex align-items-center justify-content-center" (click)="generateExcelReport()" [disabled]="isLoadingExcel || isLoadingPdf">
+            <span *ngIf="isLoadingExcel" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            <i *ngIf="!isLoadingExcel" class="bi bi-file-earmark-excel-fill me-2"></i>
+            {{ isLoadingExcel ? 'Generating Workbook...' : 'Generate Excel Report' }}
+          </button>
+          
+          <button class="btn btn-dark btn-lg py-3 fw-semibold d-flex align-items-center justify-content-center" (click)="generatePdfReport()" [disabled]="isLoadingExcel || isLoadingPdf">
+            <span *ngIf="isLoadingPdf" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            <i *ngIf="!isLoadingPdf" class="bi bi-file-earmark-pdf-fill me-2"></i>
+            {{ isLoadingPdf ? 'Compiling PDF Doc...' : 'Generate PDF Report' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Generated Reports History Log -->
+    <div class="col-lg-7">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white py-3 border-bottom border-light d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0 fw-bold text-dark"><i class="bi bi-archive-fill me-2 text-primary"></i>Recently Generated Reports</h5>
+          <button class="btn btn-sm btn-outline-secondary" (click)="fetchReportsHistory()" [disabled]="isLoadingList">
+            <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+          </button>
+        </div>
+        <div class="card-body p-0">
+          <!-- Loading -->
+          <div *ngIf="isLoadingList" class="text-center py-5">
+            <div class="spinner-border text-primary spinner-border-sm" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <div class="mt-2 text-secondary small">Scanning archive directories...</div>
+          </div>
+
+          <!-- Empty State -->
+          <div *ngIf="!isLoadingList && reportsList.length === 0" class="text-center py-5">
+            <i class="bi bi-folder-x fs-1 text-muted d-block mb-3"></i>
+            <p class="text-secondary small mb-0">No generated reports found. Click generate to start exporting.</p>
+          </div>
+
+          <!-- Table list -->
+          <div *ngIf="!isLoadingList && reportsList.length > 0" class="table-responsive" style="max-height: 380px;">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light sticky-top">
+                <tr>
+                  <th class="small fw-semibold text-secondary">Document Name</th>
+                  <th class="small fw-semibold text-secondary text-center">Format</th>
+                  <th class="small fw-semibold text-secondary text-end">Size</th>
+                  <th class="small fw-semibold text-secondary text-center">Created At</th>
+                  <th class="small fw-semibold text-secondary text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let rep of reportsList">
+                  <td class="small fw-bold text-dark text-truncate" style="max-width: 220px;">
+                    {{ rep.fileName }}
+                  </td>
+                  <td class="text-center">
+                    <span class="badge px-2 py-1" [class.bg-success]="rep.fileType === 'Excel'" [class.bg-danger]="rep.fileType === 'PDF'">
+                      {{ rep.fileType }}
+                    </span>
+                  </td>
+                  <td class="small text-end">{{ rep.fileSize }}</td>
+                  <td class="small text-secondary text-center">{{ rep.createdAt | date:'short' }}</td>
+                  <td class="text-center">
+                    <button class="btn btn-sm btn-light border-light shadow-sm text-primary" (click)="downloadReport(rep)">
+                      <i class="bi bi-download"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

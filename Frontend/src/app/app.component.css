@@ -1,0 +1,6 @@
+app-sidebar {
+  display: block;
+  width: 260px;
+  min-height: calc(100vh - 56px);
+  background-color: #212529;
+}

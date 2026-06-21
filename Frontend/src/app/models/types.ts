@@ -244,3 +244,11 @@ export interface CampaignDto {
   status: string;
   createdAt: string;
 }
+
+export interface ReportFileDto {
+  fileName: string;
+  fileType: string;
+  fileSize: string;
+  createdAt: string;
+  downloadUrl: string;
+}
