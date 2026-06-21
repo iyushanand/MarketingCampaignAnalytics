@@ -48,11 +48,14 @@ namespace Backend.Services
             var totalCustomers = await _customerRepository.Query().CountAsync();
 
             // Average Order Value (AOV): Average purchase amount of positive responses
-            var averageOrderValue = await _responseRepository.Query()
-                .Where(r => r.Response == "Yes" && r.PurchaseAmount > 0)
-                .Select(r => r.PurchaseAmount)
-                .DefaultIfEmpty(0)
-                .AverageAsync();
+            var responseQuery = _responseRepository.Query()
+                .Where(r => r.Response == "Yes" && r.PurchaseAmount > 0);
+
+            decimal averageOrderValue = 0;
+            if (await responseQuery.AnyAsync())
+            {
+                averageOrderValue = await responseQuery.AverageAsync(r => r.PurchaseAmount);
+            }
 
             // Best Marketing Channel by Revenue
             var bestChannelGroup = await _campaignRepository.Query()
