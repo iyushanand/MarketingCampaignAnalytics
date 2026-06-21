@@ -1,0 +1,16 @@
+<aside class="bg-dark text-white border-end border-secondary d-flex flex-column" style="width: 260px; min-height: calc(100vh - 56px);">
+  <div class="list-group list-group-flush w-100 flex-grow-1 p-2">
+    <a *ngFor="let item of navItems"
+       [routerLink]="item.path"
+       routerLinkActive="active bg-primary text-white"
+       class="list-group-item list-group-item-action bg-transparent text-white border-0 rounded my-1 py-2 d-flex align-items-center">
+      <i [class]="item.icon + ' me-3 fs-5'"></i>
+      <span class="small fw-semibold">{{ item.label }}</span>
+    </a>
+  </div>
+  
+  <div class="p-3 border-top border-secondary text-center">
+    <small class="text-white-50">v1.0.0 Foundation</small>
+  </div>
+</aside>
+
