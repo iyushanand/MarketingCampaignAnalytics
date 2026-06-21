@@ -123,20 +123,109 @@ export interface EdaResult {
 export interface PredictionRequest {
   age: number;
   income: number;
-  totalSpend: number;
+  education: string;
   totalPurchases: number;
+  averageSpend: number;
+  campaignChannel: string;
 }
 
 export interface PredictionResponse {
   prediction: string;
   probability: number;
+  confidenceLevel: string;
+  businessReasons: string[];
+}
+
+export interface PredictionMetrics {
+  accuracy: number;
+  precision: number;
+  recall: number;
+  f1Score: number;
+  rocAuc: number;
+  confusionMatrix: number[][];
+  classificationReport: string;
+}
+
+export interface DemographicCompare {
+  category: string;
+  averageSpend: number;
+  responseRate: number;
+  count: number;
 }
 
 export interface CustomerDemographics {
   ageDistribution: DemographicSegment[];
   genderDistribution: DemographicSegment[];
-  incomeDistribution: DemographicSegment[];
+  educationDistribution: DemographicSegment[];
   countryDistribution: DemographicSegment[];
+  incomeDistribution: DemographicSegment[];
+  incomeVsSpending: DemographicCompare[];
+  ageVsSpending: DemographicCompare[];
+  educationVsResponse: DemographicCompare[];
+  countryVsResponse: DemographicCompare[];
+}
+
+export interface RfmSegmentSummary {
+  count: number;
+  percentage: number;
+  averageSpend: number;
+  averagePurchases: number;
+  revenueContribution: number;
+}
+
+export interface CustomerSpendSummary {
+  customerId: number;
+  fullName: string;
+  country: string;
+  totalSpend: number;
+  totalPurchases: number;
+}
+
+export interface CustomerAnalytics {
+  totalCustomers: number;
+  averageIncome: number;
+  averageCustomerSpend: number;
+  averagePurchases: number;
+  averageResponseRate: number;
+  highValueCustomers: RfmSegmentSummary;
+  mediumValueCustomers: RfmSegmentSummary;
+  lowValueCustomers: RfmSegmentSummary;
+  averagePurchaseAmount: number;
+  averageCustomerLifetimeSpend: number;
+  repeatPurchaseRate: number;
+  topSpendingCustomers: CustomerSpendSummary[];
+  mostActiveCustomers: CustomerSpendSummary[];
+}
+
+export interface CustomerPersona {
+  personaName: string;
+  description: string;
+  customerCount: number;
+  averageIncome: number;
+  averageSpending: number;
+  averagePurchases: number;
+  averageResponseRate: number;
+}
+
+export interface CustomerDto {
+  customerId: number;
+  firstName: string;
+  lastName: string;
+  gender: string;
+  age: number;
+  income: number;
+  education: string;
+  maritalStatus: string;
+  country: string;
+  city: string;
+  createdAt: string;
+  
+  // RFM Metrics & Segmentation
+  recency: number;
+  frequency: number;
+  monetary: number;
+  rfmSegment: string;
+  responseRate: number;
 }
 
 export interface CampaignDto {
@@ -153,19 +242,5 @@ export interface CampaignDto {
   startDate: string;
   endDate: string;
   status: string;
-  createdAt: string;
-}
-
-export interface CustomerDto {
-  customerId: number;
-  firstName: string;
-  lastName: string;
-  gender: string;
-  age: number;
-  income: number;
-  education: string;
-  maritalStatus: string;
-  country: string;
-  city: string;
   createdAt: string;
 }

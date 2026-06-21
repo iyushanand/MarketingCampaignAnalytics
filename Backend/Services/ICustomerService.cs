@@ -5,12 +5,12 @@ using Backend.DTOs;
 namespace Backend.Services
 {
     /// <summary>
-    /// Service interface for customer demographics and RFM analysis.
+    /// Service interface for customer analytics and RFM analysis.
     /// </summary>
     public interface ICustomerService
     {
         /// <summary>
-        /// Gets all customers.
+        /// Gets all customers with details, RFM metrics, and segment tags.
         /// </summary>
         Task<IEnumerable<CustomerDto>> GetCustomersAsync();
 
@@ -20,18 +20,18 @@ namespace Backend.Services
         Task<CustomerDto?> GetCustomerByIdAsync(int id);
 
         /// <summary>
-        /// Gets customer insights (age, income, RFM lists).
+        /// Gets consolidated KPIs and behavior metrics.
         /// </summary>
-        Task<CustomerInsightsDto> GetCustomerInsightsAsync();
+        Task<CustomerAnalyticsDto> GetCustomerSummaryAsync();
 
         /// <summary>
-        /// Gets demographics distributions (Age, Gender, Income, Country).
+        /// Gets rule-based customer personas.
         /// </summary>
-        Task<CustomerDemographicsDto> GetCustomerDemographicsAsync();
+        Task<IEnumerable<CustomerPersonaDto>> GetCustomerPersonasAsync();
 
         /// <summary>
-        /// Calculates customer RFM segments (High, Medium, Low) using percentile-based logic.
+        /// Gets demographic distributions and cross-sectional analysis.
         /// </summary>
-        Task<List<RfmSegmentDto>> GetCustomerRfmTiersAsync();
+        Task<CustomerDemographicsDto> GetCustomerAnalyticsAsync();
     }
 }

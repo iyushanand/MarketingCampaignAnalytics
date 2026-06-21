@@ -1,8 +1,231 @@
-<div class="container-fluid py-4 text-center">
-  <div class="py-5 bg-white rounded shadow-sm border border-light">
-    <i class="bi bi-magic text-secondary fs-1 mb-3 d-block"></i>
-    <h3 class="fw-bold text-dark">Response Prediction Model</h3>
-    <p class="text-secondary small mb-4">Feed single customer parameters into the Logistic Regression model to forecast responses.</p>
-    <span class="badge bg-secondary px-3 py-2 fs-6">Coming in Phase 10 (Machine Learning Integration)</span>
+<div class="container-fluid py-4">
+  <div class="row mb-4 align-items-center">
+    <div class="col">
+      <h2 class="h3 mb-0 text-slate-800"><i class="bi bi-cpu-fill me-2 text-primary"></i>Campaign Response Prediction</h2>
+      <p class="text-muted mb-0 small">Fit single customer profiles into the Logistic Regression model to forecast likely campaign response rates</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Left Column: Prediction Form -->
+    <div class="col-lg-6 mb-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white py-3 border-bottom border-light">
+          <h5 class="card-title mb-0 fw-bold text-dark"><i class="bi bi-input-cursor-text me-2 text-primary"></i>Customer Profile Predictor</h5>
+        </div>
+        <div class="card-body">
+          <form (ngSubmit)="predict()" #predForm="ngForm">
+            <div class="row g-3">
+              <!-- Age -->
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold text-secondary">Customer Age</label>
+                <input type="number" class="form-control" name="age" [(ngModel)]="age" required min="18" max="100" />
+              </div>
+              <!-- Income -->
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold text-secondary">Annual Income ($)</label>
+                <input type="number" class="form-control" name="income" [(ngModel)]="income" required min="1000" />
+              </div>
+              <!-- Education -->
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold text-secondary">Education Level</label>
+                <select class="form-select" name="education" [(ngModel)]="education" required>
+                  <option *ngFor="let opt of educationOptions" [value]="opt">{{ opt }}</option>
+                </select>
+              </div>
+              <!-- Total Purchases -->
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold text-secondary">Total Lifetime Purchases</label>
+                <input type="number" class="form-control" name="totalPurchases" [(ngModel)]="totalPurchases" required min="0" />
+              </div>
+              <!-- Average Spend -->
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold text-secondary">Average Spend Per Transaction ($)</label>
+                <input type="number" class="form-control" name="averageSpend" [(ngModel)]="averageSpend" required min="0" />
+              </div>
+              <!-- Campaign Channel -->
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold text-secondary">Campaign Channel</label>
+                <select class="form-select" name="campaignChannel" [(ngModel)]="campaignChannel" required>
+                  <option *ngFor="let opt of channelOptions" [value]="opt">{{ opt }}</option>
+                </select>
+              </div>
+              
+              <div class="col-12 mt-4">
+                <button type="submit" class="btn btn-primary w-100 fw-semibold py-2" [disabled]="submitting || !predForm.valid">
+                  <span *ngIf="submitting" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  <i class="bi bi-play-circle me-1" *ngIf="!submitting"></i> Execute Prediction Inference
+                </button>
+              </div>
+            </div>
+          </form>
+
+          <div *ngIf="errorMsg" class="alert alert-danger border-0 mt-3 small p-3">
+            <i class="bi bi-x-circle-fill me-2"></i>{{ errorMsg }}
+          </div>
+          <div *ngIf="successMsg" class="alert alert-success border-0 mt-3 small p-3">
+            <i class="bi bi-check-circle-fill me-2"></i>{{ successMsg }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Prediction Results Output -->
+    <div class="col-lg-6 mb-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white py-3 border-bottom border-light">
+          <h5 class="card-title mb-0 fw-bold text-dark"><i class="bi bi-clipboard-data-fill me-2 text-success"></i>Inference Results Output</h5>
+        </div>
+        <div class="card-body d-flex flex-column justify-content-center align-items-center text-center p-4">
+          <!-- Empty State -->
+          <div *ngIf="!predictionResult" class="py-5 text-secondary">
+            <i class="bi bi-cpu fs-1 d-block mb-3 text-light-indigo"></i>
+            <p class="mb-0 small">Execute the form on the left to review likelihood response predictions, probability rates, and key factors.</p>
+          </div>
+
+          <!-- Active Result -->
+          <div *ngIf="predictionResult" class="w-100 text-start">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+              <h6 class="fw-bold mb-0 text-secondary text-uppercase small">Prediction Verdict</h6>
+              <span class="badge px-4 py-2 fs-6" 
+                    [class.bg-success]="predictionResult.prediction === 'Likely Response'" 
+                    [class.bg-danger]="predictionResult.prediction === 'Not Likely Response'">
+                {{ predictionResult.prediction }}
+              </span>
+            </div>
+
+            <!-- Probability Gauge Progress -->
+            <div class="mb-4">
+              <div class="d-flex justify-content-between mb-2">
+                <span class="small fw-semibold text-secondary">Likelihood Probability</span>
+                <span class="fw-bold text-primary">{{ predictionResult.probability | percent:'1.1-1' }}</span>
+              </div>
+              <div class="progress" style="height: 12px; background-color: #f1f3f5;">
+                <div class="progress-bar" role="progressbar" 
+                     [style.width.%]="predictionResult.probability * 100"
+                     [class.bg-success]="predictionResult.prediction === 'Likely Response'"
+                     [class.bg-danger]="predictionResult.prediction === 'Not Likely Response'"></div>
+              </div>
+            </div>
+
+            <!-- Confidence Rating -->
+            <div class="d-flex align-items-center justify-content-between mb-4 border-bottom pb-3">
+              <span class="small fw-semibold text-secondary">Model Confidence Level</span>
+              <span class="badge px-3 py-2" [ngClass]="getConfidenceBadgeClass(predictionResult.confidenceLevel)">
+                {{ predictionResult.confidenceLevel }}
+              </span>
+            </div>
+
+            <!-- Key factors list -->
+            <h6 class="fw-bold text-secondary mb-3"><i class="bi bi-lightbulb-fill text-warning me-2"></i>Key Explanations & Influencing Factors</h6>
+            <div class="d-flex flex-column gap-2">
+              <div class="p-3 bg-light rounded border-start border-primary border-3 d-flex align-items-start" 
+                   *ngFor="let reason of predictionResult.businessReasons">
+                <i class="bi bi-info-circle-fill text-primary me-2 mt-1"></i>
+                <span class="small text-dark">{{ reason }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Panel: Model Metrics -->
+  <div class="card border-0 shadow-sm mt-2 mb-4">
+    <div class="card-header bg-white py-3 border-bottom border-light d-flex justify-content-between align-items-center">
+      <h5 class="card-title mb-0 fw-bold text-dark"><i class="bi bi-graph-up me-2 text-danger"></i>Logistic Regression Model Metrics</h5>
+      <button class="btn btn-outline-secondary btn-sm" (click)="triggerTraining()" [disabled]="training">
+        <span *ngIf="training" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+        <i class="bi bi-arrow-repeat me-1" *ngIf="!training"></i> Retrain Model
+      </button>
+    </div>
+    <div class="card-body">
+      <!-- Empty metrics state -->
+      <div *ngIf="!metrics" class="text-center py-4 text-secondary">
+        <i class="bi bi-exclamation-circle fs-3 d-block mb-1 text-warning"></i>
+        <p class="mb-0 small">Model metrics are currently unavailable. retrain the model to generate reports.</p>
+      </div>
+
+      <!-- Metrics active state -->
+      <div *ngIf="metrics" class="row">
+        <!-- Core metrics cards -->
+        <div class="col-xl-7 col-lg-12 mb-4">
+          <div class="row g-2 mb-4">
+            <!-- Accuracy -->
+            <div class="col-6 col-sm-4 mb-2">
+              <div class="p-3 bg-light rounded text-center border">
+                <small class="text-muted d-block text-uppercase small font-monospace">Accuracy</small>
+                <h3 class="mb-0 fw-bold mt-1 text-dark">{{ metrics.accuracy | percent:'1.1' }}</h3>
+              </div>
+            </div>
+            <!-- Precision -->
+            <div class="col-6 col-sm-4 mb-2">
+              <div class="p-3 bg-light rounded text-center border">
+                <small class="text-muted d-block text-uppercase small font-monospace">Precision</small>
+                <h3 class="mb-0 fw-bold mt-1 text-primary">{{ metrics.precision | percent:'1.1' }}</h3>
+              </div>
+            </div>
+            <!-- Recall -->
+            <div class="col-6 col-sm-4 mb-2">
+              <div class="p-3 bg-light rounded text-center border">
+                <small class="text-muted d-block text-uppercase small font-monospace">Recall</small>
+                <h3 class="mb-0 fw-bold mt-1 text-success">{{ metrics.recall | percent:'1.1' }}</h3>
+              </div>
+            </div>
+            <!-- F1 Score -->
+            <div class="col-6 col-sm-6 mb-2">
+              <div class="p-3 bg-light rounded text-center border">
+                <small class="text-muted d-block text-uppercase small font-monospace">F1 Score</small>
+                <h3 class="mb-0 fw-bold mt-1 text-info">{{ metrics.f1Score | percent:'1.1' }}</h3>
+              </div>
+            </div>
+            <!-- ROC AUC -->
+            <div class="col-12 col-sm-6 mb-2">
+              <div class="p-3 bg-light rounded text-center border">
+                <small class="text-muted d-block text-uppercase small font-monospace">ROC AUC Score</small>
+                <h3 class="mb-0 fw-bold mt-1 text-warning">{{ metrics.rocAuc | percent:'1.1' }}</h3>
+              </div>
+            </div>
+          </div>
+
+          <!-- Confusion Matrix display -->
+          <div class="border rounded p-3">
+            <h6 class="fw-bold mb-3 text-secondary border-bottom pb-2"><i class="bi bi-grid-3x3-gap me-2"></i>Confusion Matrix</h6>
+            <div class="table-responsive">
+              <table class="table table-bordered text-center align-middle mb-0 small">
+                <thead>
+                  <tr class="table-light">
+                    <th>Actual / Predicted</th>
+                    <th>Predicted Negative (0)</th>
+                    <th>Predicted Positive (1)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="table-light fw-bold text-secondary">Actual Negative (0)</td>
+                    <td class="fw-bold text-success">{{ metrics.confusionMatrix[0] ? metrics.confusionMatrix[0][0] : 0 }} <span class="d-block text-muted small fw-normal">(True Negatives)</span></td>
+                    <td class="fw-bold text-danger">{{ metrics.confusionMatrix[0] ? metrics.confusionMatrix[0][1] : 0 }} <span class="d-block text-muted small fw-normal">(False Positives)</span></td>
+                  </tr>
+                  <tr>
+                    <td class="table-light fw-bold text-secondary">Actual Positive (1)</td>
+                    <td class="fw-bold text-danger">{{ metrics.confusionMatrix[1] ? metrics.confusionMatrix[1][0] : 0 }} <span class="d-block text-muted small fw-normal">(False Negatives)</span></td>
+                    <td class="fw-bold text-success">{{ metrics.confusionMatrix[1] ? metrics.confusionMatrix[1][1] : 0 }} <span class="d-block text-muted small fw-normal">(True Positives)</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Classification Report display -->
+        <div class="col-xl-5 col-lg-12 mb-4">
+          <div class="border rounded p-3 h-100 bg-light">
+            <h6 class="fw-bold mb-3 text-secondary border-bottom pb-2"><i class="bi bi-file-earmark-text me-2"></i>Classification Report</h6>
+            <pre class="mb-0 bg-white p-3 rounded border font-monospace small" style="overflow-x: auto;">{{ metrics.classificationReport }}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

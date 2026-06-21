@@ -6,13 +6,12 @@ import {
   CampaignPerformance, 
   CampaignComparison, 
   CampaignEffectiveness,
-  CustomerInsights, 
-  CustomerDemographics, // we will add it
-  RfmSegment,
-  EdaResult, 
-  StatisticsResult, 
+  CustomerAnalytics, 
+  CustomerPersona,
+  CustomerDemographics,
   PredictionRequest, 
   PredictionResponse,
+  PredictionMetrics,
   CampaignDto,
   CustomerDto
 } from '../models/types';
@@ -72,16 +71,16 @@ export class ApiService {
     return this.http.get<ApiResponseWrapper<CustomerDto>>(`${this.apiUrl}/customer/${id}`);
   }
 
-  getCustomerInsights(): Observable<ApiResponseWrapper<CustomerInsights>> {
-    return this.http.get<ApiResponseWrapper<CustomerInsights>>(`${this.apiUrl}/customer/insights`);
+  getCustomerSummary(): Observable<ApiResponseWrapper<CustomerAnalytics>> {
+    return this.http.get<ApiResponseWrapper<CustomerAnalytics>>(`${this.apiUrl}/customer/summary`);
   }
 
-  getCustomerDemographics(): Observable<ApiResponseWrapper<CustomerDemographics>> {
-    return this.http.get<ApiResponseWrapper<CustomerDemographics>>(`${this.apiUrl}/customer/demographics`);
+  getCustomerPersonas(): Observable<ApiResponseWrapper<CustomerPersona[]>> {
+    return this.http.get<ApiResponseWrapper<CustomerPersona[]>>(`${this.apiUrl}/customer/personas`);
   }
 
-  getCustomerRfmTiers(): Observable<ApiResponseWrapper<RfmSegment[]>> {
-    return this.http.get<ApiResponseWrapper<RfmSegment[]>>(`${this.apiUrl}/customer/rfm`);
+  getCustomerAnalytics(): Observable<ApiResponseWrapper<CustomerDemographics>> {
+    return this.http.get<ApiResponseWrapper<CustomerDemographics>>(`${this.apiUrl}/customer/analytics`);
   }
 
   loadSampleDataset(): Observable<ApiResponseWrapper<string>> {
@@ -95,7 +94,6 @@ export class ApiService {
   }
 
   getMarketingReportData(reportType: string): Observable<any[]> {
-    // Note: Reports controller returns raw JSON content content(json, "application/json")
     return this.http.get<any[]>(`${this.apiUrl}/reports/${reportType}`);
   }
 
@@ -105,5 +103,18 @@ export class ApiService {
 
   downloadPdfReport(): Observable<Blob> {
     return this.http.get(`${this.apiUrl}/report/download/pdf`, { responseType: 'blob' });
+  }
+
+  // Phase 9 Response Prediction (Logistic Regression) APIs
+  trainPredictionModel(): Observable<ApiResponseWrapper<string>> {
+    return this.http.post<ApiResponseWrapper<string>>(`${this.apiUrl}/prediction/train`, {});
+  }
+
+  predictResponse(request: PredictionRequest): Observable<ApiResponseWrapper<PredictionResponse>> {
+    return this.http.post<ApiResponseWrapper<PredictionResponse>>(`${this.apiUrl}/prediction`, request);
+  }
+
+  getPredictionMetrics(): Observable<ApiResponseWrapper<PredictionMetrics>> {
+    return this.http.get<ApiResponseWrapper<PredictionMetrics>>(`${this.apiUrl}/prediction/metrics`);
   }
 }

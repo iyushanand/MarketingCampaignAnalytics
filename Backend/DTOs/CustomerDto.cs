@@ -15,5 +15,12 @@ namespace Backend.DTOs
         public string Country { get; set; } = string.Empty;
         public string City { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
+
+        // RFM Metrics & Segmentation
+        public int Recency { get; set; }
+        public int Frequency { get; set; }
+        public decimal Monetary { get; set; }
+        public string RfmSegment { get; set; } = string.Empty; // "High Value", "Medium Value", "Low Value"
+        public double ResponseRate { get; set; }
     }
 }

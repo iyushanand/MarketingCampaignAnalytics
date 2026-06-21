@@ -8,7 +8,7 @@ using Backend.Services;
 namespace Backend.Controllers
 {
     /// <summary>
-    /// Serves customer demographics, profile data and RFM value segmentation details.
+    /// Serves customer demographics, profile data, summaries, and value segmentation details.
     /// </summary>
     [ApiController]
     [Route("api/customer")]
@@ -25,7 +25,7 @@ namespace Backend.Controllers
         }
 
         /// <summary>
-        /// Gets a paginated or standard list of customers.
+        /// Gets all customers with details, RFM metrics, and segment tags.
         /// </summary>
         [HttpGet]
         public async Task<IActionResult> GetCustomers()
@@ -49,23 +49,33 @@ namespace Backend.Controllers
         }
 
         /// <summary>
-        /// Gets country, gender, age and income distributions.
+        /// Gets consolidated KPIs and behavior metrics.
         /// </summary>
-        [HttpGet("demographics")]
-        public async Task<IActionResult> GetCustomerDemographics()
+        [HttpGet("summary")]
+        public async Task<IActionResult> GetCustomerSummary()
         {
-            var demographics = await _customerService.GetCustomerDemographicsAsync();
-            return Ok(ApiResponse<CustomerDemographicsDto>.Ok(demographics));
+            var summary = await _customerService.GetCustomerSummaryAsync();
+            return Ok(ApiResponse<CustomerAnalyticsDto>.Ok(summary));
         }
 
         /// <summary>
-        /// Gets RFM Value segments (High, Medium, Low value customers) using percentiles.
+        /// Gets rule-based customer personas.
         /// </summary>
-        [HttpGet("rfm")]
-        public async Task<IActionResult> GetCustomerRfm()
+        [HttpGet("personas")]
+        public async Task<IActionResult> GetCustomerPersonas()
         {
-            var rfm = await _customerService.GetCustomerRfmTiersAsync();
-            return Ok(ApiResponse<IEnumerable<RfmSegmentDto>>.Ok(rfm));
+            var personas = await _customerService.GetCustomerPersonasAsync();
+            return Ok(ApiResponse<IEnumerable<CustomerPersonaDto>>.Ok(personas));
+        }
+
+        /// <summary>
+        /// Gets demographic distributions and cross-sectional analysis.
+        /// </summary>
+        [HttpGet("analytics")]
+        public async Task<IActionResult> GetCustomerAnalytics()
+        {
+            var analytics = await _customerService.GetCustomerAnalyticsAsync();
+            return Ok(ApiResponse<CustomerDemographicsDto>.Ok(analytics));
         }
     }
 }

@@ -32,6 +32,8 @@ namespace Backend.Services
             { "Germany", new[] { "Berlin", "Hamburg", "Munich", "Cologne", "Frankfurt" } }
         };
 
+        private readonly IPredictionService _predictionService;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="UploadService"/> class.
         /// </summary>
@@ -39,12 +41,14 @@ namespace Backend.Services
             ApplicationDbContext context,
             IRepository<Customer> customerRepository,
             IRepository<Campaign> campaignRepository,
-            IRepository<CampaignResponse> responseRepository)
+            IRepository<CampaignResponse> responseRepository,
+            IPredictionService predictionService)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _customerRepository = customerRepository ?? throw new ArgumentNullException(nameof(customerRepository));
             _campaignRepository = campaignRepository ?? throw new ArgumentNullException(nameof(campaignRepository));
             _responseRepository = responseRepository ?? throw new ArgumentNullException(nameof(responseRepository));
+            _predictionService = predictionService ?? throw new ArgumentNullException(nameof(predictionService));
         }
 
         /// <summary>
@@ -77,7 +81,12 @@ namespace Backend.Services
                 throw new FileNotFoundException("Kaggle Customer Personality Analysis CSV file could not be resolved.");
             }
 
-            return await DbInitializer.LoadSampleDataset(_context, csvPath);
+            bool loaded = await DbInitializer.LoadSampleDataset(_context, csvPath);
+            if (loaded)
+            {
+                await _predictionService.TrainModelAsync();
+            }
+            return loaded;
         }
 
         /// <summary>
@@ -253,6 +262,7 @@ namespace Backend.Services
                 }
             }
 
+            await _predictionService.TrainModelAsync();
             return true;
         }
 
