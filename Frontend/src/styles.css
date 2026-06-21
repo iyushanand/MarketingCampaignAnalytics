@@ -1,1 +1,106 @@
-/* You can add global styles to this file, and also import other style files */
+/* Import Bootstrap Icons if CDN fails */
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css");
+
+:root {
+  --primary-color: #0f2c59;
+  --secondary-color: #dac0a3;
+  --dark-color: #102a43;
+  --light-color: #f0f4f8;
+  --border-color: #bcccdc;
+}
+
+body {
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--light-color);
+  color: var(--dark-color);
+  margin: 0;
+  padding: 0;
+}
+
+/* Sidebar and Main Layout */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-vh: 100vh;
+}
+
+.main-content {
+  background-color: #f8fafc;
+  min-height: calc(100vh - 56px);
+  padding: 1.5rem;
+}
+
+/* Card Styling */
+.card {
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  background-color: #ffffff;
+  margin-bottom: 1.5rem;
+}
+
+.card-header {
+  background-color: transparent;
+  border-bottom: 1px solid #f1f5f9;
+  font-weight: 600;
+  padding: 1rem 1.25rem;
+}
+
+.kpi-card {
+  transition: transform 0.2s;
+}
+
+.kpi-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Table styling */
+.table-responsive {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+.table th {
+  background-color: #f8fafc;
+  color: #475569;
+  font-weight: 600;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+/* Badges and tags */
+.badge-best {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.badge-worst {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+/* Spinner overlay */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* Toast container styling */
+.toast-container-custom {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1055;
+}

@@ -7,64 +7,96 @@ import {
   CampaignComparison, 
   CampaignEffectiveness,
   CustomerInsights, 
+  CustomerDemographics, // we will add it
+  RfmSegment,
   EdaResult, 
   StatisticsResult, 
   PredictionRequest, 
-  PredictionResponse 
+  PredictionResponse,
+  CampaignDto,
+  CustomerDto
 } from '../models/types';
+
+// Let's add ApiResponse definition directly to make it self-contained
+export interface ApiResponseWrapper<T> {
+  success: boolean;
+  message: string;
+  data: T;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  private apiUrl = 'http://localhost:5246/api'; // ASP.NET Core URL (adjust as needed or read config)
+  private apiUrl = 'http://localhost:5224/api'; // Correct ASP.NET Core port from Phase 3 logs
 
   constructor(private http: HttpClient) { }
 
-  getDashboardKpis(): Observable<DashboardKpis> {
-    return this.http.get<DashboardKpis>(`${this.apiUrl}/dashboard/kpis`);
+  getDashboardKpis(): Observable<ApiResponseWrapper<DashboardKpis>> {
+    return this.http.get<ApiResponseWrapper<DashboardKpis>>(`${this.apiUrl}/dashboard/kpis`);
   }
 
-  getCampaignPerformance(): Observable<CampaignPerformance[]> {
-    return this.http.get<CampaignPerformance[]>(`${this.apiUrl}/campaign/performance`);
+  getRevenueTrend(): Observable<ApiResponseWrapper<any[]>> {
+    return this.http.get<ApiResponseWrapper<any[]>>(`${this.apiUrl}/dashboard/revenue-trend`);
   }
 
-  getCampaignComparison(): Observable<CampaignComparison[]> {
-    return this.http.get<CampaignComparison[]>(`${this.apiUrl}/campaign/comparison`);
+  getTopCampaigns(): Observable<ApiResponseWrapper<CampaignDto[]>> {
+    return this.http.get<ApiResponseWrapper<CampaignDto[]>>(`${this.apiUrl}/dashboard/top-campaigns`);
   }
 
-  getCampaignEffectiveness(): Observable<CampaignEffectiveness[]> {
-    return this.http.get<CampaignEffectiveness[]>(`${this.apiUrl}/campaign/effectiveness`);
+  getCampaigns(): Observable<ApiResponseWrapper<CampaignDto[]>> {
+    return this.http.get<ApiResponseWrapper<CampaignDto[]>>(`${this.apiUrl}/campaign`);
   }
 
-  getCustomerInsights(): Observable<CustomerInsights> {
-    return this.http.get<CustomerInsights>(`${this.apiUrl}/customer/insights`);
+  getCampaignById(id: number): Observable<ApiResponseWrapper<CampaignDto>> {
+    return this.http.get<ApiResponseWrapper<CampaignDto>>(`${this.apiUrl}/campaign/${id}`);
   }
 
-  getEdaResults(): Observable<EdaResult> {
-    return this.http.get<EdaResult>(`${this.apiUrl}/analytics/eda`);
+  getCampaignPerformance(): Observable<ApiResponseWrapper<CampaignPerformance[]>> {
+    return this.http.get<ApiResponseWrapper<CampaignPerformance[]>>(`${this.apiUrl}/campaign/performance`);
   }
 
-  getStatisticsResults(): Observable<StatisticsResult> {
-    return this.http.get<StatisticsResult>(`${this.apiUrl}/analytics/statistics`);
+  getCampaignComparison(): Observable<ApiResponseWrapper<CampaignComparison[]>> {
+    return this.http.get<ApiResponseWrapper<CampaignComparison[]>>(`${this.apiUrl}/campaign/comparison`);
   }
 
-  predictResponse(request: PredictionRequest): Observable<PredictionResponse> {
-    return this.http.post<PredictionResponse>(`${this.apiUrl}/analytics/predict`, request);
+  getCampaignEffectiveness(): Observable<ApiResponseWrapper<CampaignEffectiveness[]>> {
+    return this.http.get<ApiResponseWrapper<CampaignEffectiveness[]>>(`${this.apiUrl}/campaign/effectiveness`);
   }
 
-  loadSampleDataset(): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/upload/sample`, {});
+  getCustomers(): Observable<ApiResponseWrapper<CustomerDto[]>> {
+    return this.http.get<ApiResponseWrapper<CustomerDto[]>>(`${this.apiUrl}/customer`);
   }
 
-  uploadCsv(file: File): Observable<any> {
+  getCustomerById(id: number): Observable<ApiResponseWrapper<CustomerDto>> {
+    return this.http.get<ApiResponseWrapper<CustomerDto>>(`${this.apiUrl}/customer/${id}`);
+  }
+
+  getCustomerInsights(): Observable<ApiResponseWrapper<CustomerInsights>> {
+    return this.http.get<ApiResponseWrapper<CustomerInsights>>(`${this.apiUrl}/customer/insights`);
+  }
+
+  getCustomerDemographics(): Observable<ApiResponseWrapper<CustomerDemographics>> {
+    return this.http.get<ApiResponseWrapper<CustomerDemographics>>(`${this.apiUrl}/customer/demographics`);
+  }
+
+  getCustomerRfmTiers(): Observable<ApiResponseWrapper<RfmSegment[]>> {
+    return this.http.get<ApiResponseWrapper<RfmSegment[]>>(`${this.apiUrl}/customer/rfm`);
+  }
+
+  loadSampleDataset(): Observable<ApiResponseWrapper<string>> {
+    return this.http.post<ApiResponseWrapper<string>>(`${this.apiUrl}/upload/sample`, {});
+  }
+
+  uploadCsv(file: File): Observable<ApiResponseWrapper<any>> {
     const formData = new FormData();
     formData.append('file', file);
-    return this.http.post<any>(`${this.apiUrl}/upload/csv`, formData);
+    return this.http.post<ApiResponseWrapper<any>>(`${this.apiUrl}/upload/csv`, formData);
   }
 
   getMarketingReportData(reportType: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/report/marketing-report/${reportType}`);
+    // Note: Reports controller returns raw JSON content content(json, "application/json")
+    return this.http.get<any[]>(`${this.apiUrl}/reports/${reportType}`);
   }
 
   downloadExcelReport(): Observable<Blob> {

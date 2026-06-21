@@ -1,4 +1,115 @@
 <div class="container-fluid py-4">
-  <h1>CampaignPerformanceComponent Works</h1>
-</div>
+  <div class="row mb-4 align-items-center">
+    <div class="col">
+      <h2 class="h3 mb-0 text-slate-800"><i class="bi bi-speedometer2 me-2 text-primary"></i>Campaign Performance</h2>
+      <p class="text-muted mb-0 small">Analyze cost vs revenue return margins across active and completed campaigns</p>
+    </div>
+  </div>
 
+  <!-- DB Empty Alert -->
+  <div *ngIf="isDbEmpty && !loading" class="alert alert-warning border-0 shadow-sm p-4 d-flex justify-content-between align-items-center">
+    <div>
+      <h5 class="alert-heading fw-bold mb-1"><i class="bi bi-exclamation-triangle-fill me-2"></i>No Data Found</h5>
+      <p class="mb-0 text-secondary small">Seed or upload a dataset to preview campaign performance graphs and tables.</p>
+    </div>
+    <a href="/upload-dataset" class="btn btn-warning fw-semibold"><i class="bi bi-cloud-arrow-up-fill me-2"></i>Upload Dataset</a>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <div class="mt-3 text-secondary">Loading campaign performance metrics...</div>
+  </div>
+
+  <!-- Filters Panel -->
+  <div *ngIf="!isDbEmpty && !loading" class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-3">
+      <div class="row g-3">
+        <!-- Search -->
+        <div class="col-md-6 col-lg-8">
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-secondary"></i></span>
+            <input type="text" class="form-control border-start-0 ps-1" placeholder="Search by campaign name..." [(ngModel)]="searchText" (ngModelChange)="applyFilters()" />
+          </div>
+        </div>
+        <!-- Channel Select -->
+        <div class="col-md-6 col-lg-4">
+          <select class="form-select" [(ngModel)]="selectedChannel" (change)="applyFilters()">
+            <option value="">All Channels</option>
+            <option *ngFor="let ch of channelsList" [value]="ch">{{ ch }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Spend vs Revenue Chart -->
+  <div *ngIf="!isDbEmpty && !loading" class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-white py-3 border-bottom border-light">
+      <h5 class="card-title mb-0 fw-bold text-dark"><i class="bi bi-bar-chart-fill me-2 text-danger"></i>Spend vs Revenue Comparison</h5>
+    </div>
+    <div class="card-body p-3" style="height: 320px; position: relative;">
+      <canvas #spendRevenueCanvas></canvas>
+    </div>
+  </div>
+
+  <!-- Performance Table -->
+  <div *ngIf="!isDbEmpty && !loading" class="card border-0 shadow-sm">
+    <div class="card-header bg-white py-3 border-bottom border-light">
+      <h5 class="card-title mb-0 fw-bold text-dark"><i class="bi bi-table me-2 text-primary"></i>Campaign ROI & Conversions Table</h5>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Campaign Name</th>
+              <th>Channel</th>
+              <th>Spend</th>
+              <th>Revenue</th>
+              <th>ROI</th>
+              <th>CTR</th>
+              <th>Conversion Rate</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let c of paginatedCampaigns">
+              <td class="fw-bold">{{ c.campaignName }}</td>
+              <td>{{ c.marketingChannel }}</td>
+              <td>{{ c.spend | currency }}</td>
+              <td>{{ c.revenue | currency }}</td>
+              <td [class.text-success]="c.roi >= 0" [class.text-danger]="c.roi < 0" class="fw-bold">
+                {{ c.roi | percent:'1.1-2' }}
+              </td>
+              <td>{{ c.ctr | percent:'1.2-2' }}</td>
+              <td>{{ c.conversionRate | percent:'1.2-2' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination Footer -->
+      <div class="d-flex justify-content-between align-items-center p-3 border-top border-light">
+        <div class="small text-secondary">
+          Showing page <strong>{{ currentPage }}</strong> of <strong>{{ totalPages }}</strong>
+        </div>
+        <nav aria-label="Table navigation">
+          <ul class="pagination pagination-sm mb-0">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <button class="page-link" (click)="prevPage()" aria-label="Previous">
+                <span aria-hidden="true">&laquo; Previous</span>
+              </button>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage === totalPages">
+              <button class="page-link" (click)="nextPage()" aria-label="Next">
+                <span aria-hidden="true">Next &raquo;</span>
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>

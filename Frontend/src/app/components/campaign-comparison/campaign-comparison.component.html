@@ -1,4 +1,74 @@
 <div class="container-fluid py-4">
-  <h1>CampaignComparisonComponent Works</h1>
-</div>
+  <div class="row mb-4 align-items-center">
+    <div class="col">
+      <h2 class="h3 mb-0 text-slate-800"><i class="bi bi-arrow-left-right me-2 text-primary"></i>Campaign Comparison</h2>
+      <p class="text-muted mb-0 small">Cross-analyze budgets, spends, and revenues to benchmark channel efficiencies</p>
+    </div>
+  </div>
 
+  <!-- DB Empty Alert -->
+  <div *ngIf="isDbEmpty && !loading" class="alert alert-warning border-0 shadow-sm p-4 d-flex justify-content-between align-items-center">
+    <div>
+      <h5 class="alert-heading fw-bold mb-1"><i class="bi bi-exclamation-triangle-fill me-2"></i>No Data Found</h5>
+      <p class="mb-0 text-secondary small">Upload a dataset to compare campaigns side-by-side.</p>
+    </div>
+    <a href="/upload-dataset" class="btn btn-warning fw-semibold"><i class="bi bi-cloud-arrow-up-fill me-2"></i>Upload Dataset</a>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <div class="mt-3 text-secondary">Loading campaign comparison...</div>
+  </div>
+
+  <!-- Legend Cards -->
+  <div *ngIf="!isDbEmpty && !loading" class="row mb-3">
+    <div class="col-md-6 mb-2">
+      <div class="card bg-success text-white border-0 shadow-sm">
+        <div class="card-body py-2 px-3 small fw-semibold">
+          <i class="bi bi-arrow-up-circle-fill me-2"></i>Highlighted cells indicate the <strong>Highest ROI Campaign</strong> ({{ highestRoi | percent:'1.1-2' }})
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 mb-2">
+      <div class="card bg-danger text-white border-0 shadow-sm">
+        <div class="card-body py-2 px-3 small fw-semibold">
+          <i class="bi bi-arrow-down-circle-fill me-2"></i>Highlighted cells indicate the <strong>Lowest ROI Campaign</strong> ({{ lowestRoi | percent:'1.1-2' }})
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comparison Card -->
+  <div *ngIf="!isDbEmpty && !loading" class="card border-0 shadow-sm">
+    <div class="card-header bg-white py-3 border-bottom border-light">
+      <h5 class="card-title mb-0 fw-bold text-dark"><i class="bi bi-arrow-left-right me-2 text-primary"></i>Campaign Budget & Revenue Matrix</h5>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 text-center">
+          <thead>
+            <tr class="text-start">
+              <th class="text-start">Campaign Name</th>
+              <th>Spend</th>
+              <th>Revenue</th>
+              <th>ROI</th>
+              <th>Conversion Rate</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let c of campaigns" [class.table-success]="c.roi === highestRoi" [class.table-danger]="c.roi === lowestRoi">
+              <td class="fw-bold text-start">{{ c.campaignName }}</td>
+              <td>{{ c.spend | currency }}</td>
+              <td>{{ c.revenue | currency }}</td>
+              <td class="fw-bold">{{ c.roi | percent:'1.1-2' }}</td>
+              <td>{{ c.conversionRate | percent:'1.2-2' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

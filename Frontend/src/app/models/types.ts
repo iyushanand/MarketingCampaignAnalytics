@@ -11,6 +11,7 @@ export interface DashboardKpis {
 
 export interface CampaignPerformance {
   campaignName: string;
+  marketingChannel: string;
   spend: number;
   revenue: number;
   roi: number;
@@ -129,4 +130,42 @@ export interface PredictionRequest {
 export interface PredictionResponse {
   prediction: string;
   probability: number;
+}
+
+export interface CustomerDemographics {
+  ageDistribution: DemographicSegment[];
+  genderDistribution: DemographicSegment[];
+  incomeDistribution: DemographicSegment[];
+  countryDistribution: DemographicSegment[];
+}
+
+export interface CampaignDto {
+  campaignId: number;
+  campaignName: string;
+  campaignType: string;
+  marketingChannel: string;
+  budget: number;
+  spend: number;
+  revenue: number;
+  conversions: number;
+  clicks: number;
+  impressions: number;
+  startDate: string;
+  endDate: string;
+  status: string;
+  createdAt: string;
+}
+
+export interface CustomerDto {
+  customerId: number;
+  firstName: string;
+  lastName: string;
+  gender: string;
+  age: number;
+  income: number;
+  education: string;
+  maritalStatus: string;
+  country: string;
+  city: string;
+  createdAt: string;
 }

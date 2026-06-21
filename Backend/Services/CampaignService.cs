@@ -55,6 +55,7 @@ namespace Backend.Services
             return campaigns.Select(c => new CampaignPerformanceDto
             {
                 CampaignName = c.CampaignName,
+                MarketingChannel = c.MarketingChannel,
                 Spend = c.Spend,
                 Revenue = c.Revenue,
                 Roi = c.Spend > 0 ? Math.Round((c.Revenue - c.Spend) / c.Spend, 4) : 0,

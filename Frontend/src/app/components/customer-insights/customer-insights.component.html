@@ -1,4 +1,113 @@
 <div class="container-fluid py-4">
-  <h1>CustomerInsightsComponent Works</h1>
-</div>
+  <div class="row mb-4 align-items-center">
+    <div class="col">
+      <h2 class="h3 mb-0 text-slate-800"><i class="bi bi-people-fill me-2 text-primary"></i>Customer Insights</h2>
+      <p class="text-muted mb-0 small">Explore customer demographics profiles and value tier lists based on purchasing histories</p>
+    </div>
+  </div>
 
+  <!-- DB Empty Alert -->
+  <div *ngIf="isDbEmpty && !loading" class="alert alert-warning border-0 shadow-sm p-4 d-flex justify-content-between align-items-center">
+    <div>
+      <h5 class="alert-heading fw-bold mb-1"><i class="bi bi-exclamation-triangle-fill me-2"></i>No Customer Records</h5>
+      <p class="mb-0 text-secondary small">Seed the dataset in the Upload Dataset tab to view customer summaries.</p>
+    </div>
+    <a href="/upload-dataset" class="btn btn-warning fw-semibold"><i class="bi bi-cloud-arrow-up-fill me-2"></i>Upload Dataset</a>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <div class="mt-3 text-secondary">Loading customer profiles...</div>
+  </div>
+
+  <!-- Charts Layout Grid -->
+  <div *ngIf="!isDbEmpty && !loading" class="row">
+    <!-- Age Dist -->
+    <div class="col-lg-6 mb-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3">
+          <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-calendar-check me-2 text-primary"></i>Age Distribution</h6>
+        </div>
+        <div class="card-body p-3" style="height: 250px; position: relative;">
+          <canvas #ageChartCanvas></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gender Dist -->
+    <div class="col-lg-6 mb-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3">
+          <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-gender-ambiguous me-2 text-danger"></i>Gender Distribution</h6>
+        </div>
+        <div class="card-body p-3" style="height: 250px; position: relative;">
+          <canvas #genderChartCanvas></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Income Dist -->
+    <div class="col-lg-6 mb-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3">
+          <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-cash me-2 text-success"></i>Income Distribution</h6>
+        </div>
+        <div class="card-body p-3" style="height: 250px; position: relative;">
+          <canvas #incomeChartCanvas></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Country Dist -->
+    <div class="col-lg-6 mb-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3">
+          <h6 class="mb-0 fw-bold text-dark"><i class="bi bi-geo-alt-fill me-2 text-warning"></i>Country Distribution</h6>
+        </div>
+        <div class="card-body p-3" style="height: 250px; position: relative;">
+          <canvas #countryChartCanvas></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RFM Segments Section -->
+  <div *ngIf="rfmSegments.length > 0 && !isDbEmpty && !loading" class="row mt-2">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white py-3 border-bottom border-light">
+          <h5 class="card-title mb-0 fw-bold text-dark"><i class="bi bi-funnel-fill me-2 text-primary"></i>Customer Segmentation Tiers (RFM)</h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Value Segment</th>
+                  <th>Customer Count</th>
+                  <th>Average Purchase Value</th>
+                  <th>Distribution Percentage</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let s of rfmSegments">
+                  <td class="fw-bold">
+                    <span [class]="s.segment === 'High Value' ? 'badge bg-success px-3 py-2' : s.segment === 'Medium Value' ? 'badge bg-info text-dark px-3 py-2' : 'badge bg-secondary px-3 py-2'">
+                      {{ s.segment }}
+                    </span>
+                  </td>
+                  <td>{{ s.count | number }}</td>
+                  <td class="fw-bold text-dark">{{ s.averageSpend | currency }}</td>
+                  <td>{{ s.percentage | percent:'1.1-2' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
