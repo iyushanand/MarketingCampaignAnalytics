@@ -2,7 +2,7 @@
 
 An enterprise-grade, full-stack marketing measurement, customer segmentation, and predictive targeting system. This platform enables marketing teams and business executives to optimize ad spend, measure campaign ROI, group customers by purchase behavior, perform advanced statistical testing, and predict target response likelihoods.
 
-Designed as a professional portfolio showcase for analytical and full-stack engineering roles (e.g., **American Express AIM Analyst**, **Deloitte**, **EY**, **Accenture**), it demonstrates software engineering best practices, database performance tuning, inter-process communication, and machine learning pipeline integration.
+Designed as a professional portfolio showcase for analytical and full-stack engineering roles (e.g., **AIM Analyst**, **Deloitte**, **EY**, **Accenture**), it demonstrates software engineering best practices, database performance tuning, inter-process communication, and machine learning pipeline integration.
 
 ---
 
@@ -123,7 +123,7 @@ MarketingCampaignAnalytics/
 
 ## 📊 Key Highlights for Recruiting Managers
 
-*   **American Express AIM Role Alignment**: Features industry-standard RFM modeling, campaign ROI measurement, and response scoring. Showcases an understanding of budget-optimal targeting (Logistic Regression coefficients and precision-oriented threshold tuning).
+*   **AIM Analyst Role Alignment**: Features industry-standard RFM modeling, campaign ROI measurement, and response scoring. Showcases an understanding of budget-optimal targeting (Logistic Regression coefficients and precision-oriented threshold tuning).
 *   **Advanced ML Pipeline**: The Logistic Regression classifier runs custom categorical One-Hot Encoding and Standard Scaling. Model coefficients are evaluated to provide business-level rationales (e.g., "Customer average spend is above the market average, increasing response probability").
 *   **Production-Grade Stability**: Includes a global API exception handling middleware, explicit database transactional constraints, and asynchronous thread-safe process managers preventing memory leakage.
 *   **Zero-Warning Build Quality**: Code compiles with zero warnings or type compiler flags on both .NET 8 and Angular 19 platforms.

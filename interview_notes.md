@@ -1,6 +1,6 @@
 # Technical Interview Preparation Guide
 
-This document prepares candidates for technical interviews (e.g., American Express AIM Analyst, Big 4 consulting firms, Senior BI/Full Stack roles) using the architecture, algorithms, and design choices of the **Marketing Campaign Analytics Platform**.
+This document prepares candidates for technical interviews (e.g., Marketing Analytics Analyst, Big 4 consulting firms, Senior BI/Full Stack roles) using the architecture, algorithms, and design choices of the **Marketing Campaign Analytics Platform**.
 
 ---
 

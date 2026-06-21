@@ -1,9 +1,9 @@
-<div class="d-flex flex-column min-vh-100">
+<div class="app-wrapper">
   <app-navbar></app-navbar>
   
-  <div class="d-flex flex-grow-1">
+  <div class="content-row">
     <app-sidebar></app-sidebar>
-    <main class="flex-grow-1 bg-light" style="overflow-y: auto;">
+    <main>
       <router-outlet></router-outlet>
     </main>
   </div>
