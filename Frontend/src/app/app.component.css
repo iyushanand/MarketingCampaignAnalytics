@@ -15,7 +15,7 @@
   display: flex;
   flex: 1 1 auto;
   overflow: hidden;
-  height: calc(100vh - 56px - 40px); /* Constrain height between navbar and footer */
+  height: calc(100vh - 56px); /* Subtracted navbar height only */
 }
 
 app-sidebar {
