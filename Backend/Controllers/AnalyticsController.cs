@@ -1,46 +1,52 @@
-using System;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Backend.DTOs;
-using Backend.Services;
 
 namespace Backend.Controllers
 {
+    /// <summary>
+    /// Placeholder controller for analytical and machine learning services.
+    /// </summary>
     [ApiController]
     [Route("api/analytics")]
     public class AnalyticsController : ControllerBase
     {
-        private readonly IAnalyticsService _analyticsService;
-
-        public AnalyticsController(IAnalyticsService analyticsService)
-        {
-            _analyticsService = analyticsService ?? throw new ArgumentNullException(nameof(analyticsService));
-        }
-
+        /// <summary>
+        /// Gets Exploratory Data Analysis results (Placeholder).
+        /// </summary>
         [HttpGet("eda")]
-        public async Task<IActionResult> GetEdaResults()
+        public IActionResult GetEda()
         {
-            var result = await _analyticsService.GetEdaResultsAsync();
-            return Ok(result);
-        }
-
-        [HttpGet("statistics")]
-        public async Task<IActionResult> GetStatisticsResults()
-        {
-            var result = await _analyticsService.GetStatisticsResultsAsync();
-            return Ok(result);
-        }
-
-        [HttpPost("predict")]
-        public async Task<IActionResult> PredictResponse([FromBody] PredictionRequestDto request)
-        {
-            if (request == null)
+            return StatusCode(StatusCodes.Status501NotImplemented, new
             {
-                return BadRequest(new { Message = "Invalid prediction parameters." });
-            }
+                success = false,
+                message = "Implemented in Phase 8"
+            });
+        }
 
-            var result = await _analyticsService.PredictResponseAsync(request);
-            return Ok(result);
+        /// <summary>
+        /// Gets statistical inference calculations (Placeholder).
+        /// </summary>
+        [HttpGet("statistics")]
+        public IActionResult GetStatistics()
+        {
+            return StatusCode(StatusCodes.Status501NotImplemented, new
+            {
+                success = false,
+                message = "Implemented in Phase 8"
+            });
+        }
+
+        /// <summary>
+        /// Predicts a customer campaign response (Placeholder).
+        /// </summary>
+        [HttpPost("prediction")]
+        public IActionResult PredictResponse()
+        {
+            return StatusCode(StatusCodes.Status501NotImplemented, new
+            {
+                success = false,
+                message = "Implemented in Phase 10"
+            });
         }
     }
 }

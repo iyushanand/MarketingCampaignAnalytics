@@ -1,48 +1,66 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Backend.DTOs;
 using Backend.Services;
 
 namespace Backend.Controllers
 {
+    /// <summary>
+    /// Serves predefined marketing reports in JSON format.
+    /// </summary>
     [ApiController]
-    [Route("api/report")]
+    [Route("api/reports")]
     public class ReportsController : ControllerBase
     {
         private readonly IReportService _reportService;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReportsController"/> class.
+        /// </summary>
         public ReportsController(IReportService reportService)
         {
             _reportService = reportService ?? throw new ArgumentNullException(nameof(reportService));
         }
 
-        [HttpGet("marketing-report/{reportType}")]
-        public async Task<IActionResult> GetMarketingReportData(string reportType)
+        /// <summary>
+        /// Gets predefined campaign summary metrics.
+        /// </summary>
+        [HttpGet("campaign")]
+        public async Task<IActionResult> GetCampaignReport()
         {
-            var data = await _reportService.GetMarketingReportDataAsync(reportType);
-            return Content(data, "application/json");
+            var dataJson = await _reportService.GetMarketingReportDataAsync("campaign");
+            return Content(dataJson, "application/json");
         }
 
-        [HttpGet("download/excel")]
-        public async Task<IActionResult> DownloadExcelReport()
+        /// <summary>
+        /// Gets customer lifetime value and purchase counts.
+        /// </summary>
+        [HttpGet("customer")]
+        public async Task<IActionResult> GetCustomerReport()
         {
-            var fileContents = await _reportService.GenerateExcelReportAsync();
-            if (fileContents == null || fileContents.Length == 0)
-            {
-                return BadRequest("No report available.");
-            }
-            return File(fileContents, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Marketing_Campaign_Analytics_Report.xlsx");
+            var dataJson = await _reportService.GetMarketingReportDataAsync("customer");
+            return Content(dataJson, "application/json");
         }
 
-        [HttpGet("download/pdf")]
-        public async Task<IActionResult> DownloadPdfReport()
+        /// <summary>
+        /// Gets marketing channel effectiveness (spend, conversions, revenue, ROI).
+        /// </summary>
+        [HttpGet("channel")]
+        public async Task<IActionResult> GetChannelReport()
         {
-            var fileContents = await _reportService.GeneratePdfReportAsync();
-            if (fileContents == null || fileContents.Length == 0)
-            {
-                return BadRequest("No report available.");
-            }
-            return File(fileContents, "application/pdf", "Marketing_Campaign_Executive_Summary.pdf");
+            var dataJson = await _reportService.GetMarketingReportDataAsync("channel");
+            return Content(dataJson, "application/json");
+        }
+
+        /// <summary>
+        /// Gets monthly breakdown of revenue and marketing spends.
+        /// </summary>
+        [HttpGet("monthly")]
+        public async Task<IActionResult> GetMonthlyReport()
+        {
+            var dataJson = await _reportService.GetMarketingReportDataAsync("monthly");
+            return Content(dataJson, "application/json");
         }
     }
 }
