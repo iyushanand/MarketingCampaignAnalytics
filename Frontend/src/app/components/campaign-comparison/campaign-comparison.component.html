@@ -1,7 +1,7 @@
 <div class="container-fluid py-4">
   <div class="row mb-4 align-items-center">
     <div class="col">
-      <h2 class="h3 mb-0 text-slate-800"><i class="bi bi-arrow-left-right me-2 text-primary"></i>Campaign Comparison</h2>
+      <h2 class="h3 mb-0 text-slate-800"><i class="bi bi-arrow-left-right me-2 text-primary"></i>Campaign Comparison benchmarking</h2>
       <p class="text-muted mb-0 small">Cross-analyze budgets, spends, and revenues to benchmark channel efficiencies</p>
     </div>
   </div>
@@ -10,7 +10,7 @@
   <div *ngIf="isDbEmpty && !loading" class="alert alert-warning border-0 shadow-sm p-4 d-flex justify-content-between align-items-center">
     <div>
       <h5 class="alert-heading fw-bold mb-1"><i class="bi bi-exclamation-triangle-fill me-2"></i>No Data Found</h5>
-      <p class="mb-0 text-secondary small">Upload a dataset to compare campaigns side-by-side.</p>
+      <p class="mb-0 text-secondary small">Seed or upload a dataset to compare campaigns side-by-side.</p>
     </div>
     <a href="/upload-dataset" class="btn btn-warning fw-semibold"><i class="bi bi-cloud-arrow-up-fill me-2"></i>Upload Dataset</a>
   </div>
@@ -23,51 +23,216 @@
     <div class="mt-3 text-secondary">Loading campaign comparison...</div>
   </div>
 
-  <!-- Legend Cards -->
-  <div *ngIf="!isDbEmpty && !loading" class="row mb-3">
-    <div class="col-md-6 mb-2">
-      <div class="card bg-success text-white border-0 shadow-sm">
-        <div class="card-body py-2 px-3 small fw-semibold">
-          <i class="bi bi-arrow-up-circle-fill me-2"></i>Highlighted cells indicate the <strong>Highest ROI Campaign</strong> ({{ highestRoi | percent:'1.1-2' }})
+  <div *ngIf="!isDbEmpty && !loading">
+    <!-- Comparison Highlight Cards -->
+    <div class="row mb-4">
+      <!-- Highest Revenue -->
+      <div class="col-md-3 mb-3" *ngIf="highestRevenueCamp">
+        <div class="card h-100 border-0 shadow-sm border-start border-primary border-4">
+          <div class="card-body p-3">
+            <small class="text-muted fw-semibold d-block">Highest Revenue</small>
+            <strong class="text-dark d-block mt-1 text-truncate">{{ highestRevenueCamp.campaignName }}</strong>
+            <h5 class="mb-0 fw-bold mt-2 text-primary">{{ highestRevenueCamp.revenue | currency:'USD':'symbol':'1.0-0' }}</h5>
+            <div class="small text-muted mt-1">ROI: {{ highestRevenueCamp.roi | percent:'1.1' }}</div>
+          </div>
+        </div>
+      </div>
+      <!-- Highest ROI -->
+      <div class="col-md-3 mb-3" *ngIf="highestRoiCamp">
+        <div class="card h-100 border-0 shadow-sm border-start border-success border-4">
+          <div class="card-body p-3">
+            <small class="text-muted fw-semibold d-block">Highest ROI</small>
+            <strong class="text-dark d-block mt-1 text-truncate">{{ highestRoiCamp.campaignName }}</strong>
+            <h5 class="mb-0 fw-bold mt-2 text-success">{{ highestRoiCamp.roi | percent:'1.1-2' }}</h5>
+            <div class="small text-muted mt-1">Spend: {{ highestRoiCamp.spend | currency:'USD':'symbol':'1.0-0' }}</div>
+          </div>
+        </div>
+      </div>
+      <!-- Highest Conversion Rate -->
+      <div class="col-md-3 mb-3" *ngIf="highestConversionCamp">
+        <div class="card h-100 border-0 shadow-sm border-start border-info border-4">
+          <div class="card-body p-3">
+            <small class="text-muted fw-semibold d-block">Highest Conv. Rate</small>
+            <strong class="text-dark d-block mt-1 text-truncate">{{ highestConversionCamp.campaignName }}</strong>
+            <h5 class="mb-0 fw-bold mt-2 text-info">{{ highestConversionCamp.conversionRate | percent:'1.2-2' }}</h5>
+            <div class="small text-muted mt-1">Clicks: {{ highestConversionCamp.clicks | number }}</div>
+          </div>
+        </div>
+      </div>
+      <!-- Lowest Performing (ROI) -->
+      <div class="col-md-3 mb-3" *ngIf="lowestRoiCamp">
+        <div class="card h-100 border-0 shadow-sm border-start border-danger border-4">
+          <div class="card-body p-3">
+            <small class="text-muted fw-semibold d-block">Lowest Performing</small>
+            <strong class="text-dark d-block mt-1 text-truncate">{{ lowestRoiCamp.campaignName }}</strong>
+            <h5 class="mb-0 fw-bold mt-2 text-danger">{{ lowestRoiCamp.roi | percent:'1.1-2' }}</h5>
+            <div class="small text-muted mt-1">Revenue: {{ lowestRoiCamp.revenue | currency:'USD':'symbol':'1.0-0' }}</div>
+          </div>
         </div>
       </div>
     </div>
-    <div class="col-md-6 mb-2">
-      <div class="card bg-danger text-white border-0 shadow-sm">
-        <div class="card-body py-2 px-3 small fw-semibold">
-          <i class="bi bi-arrow-down-circle-fill me-2"></i>Highlighted cells indicate the <strong>Lowest ROI Campaign</strong> ({{ lowestRoi | percent:'1.1-2' }})
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- Comparison Card -->
-  <div *ngIf="!isDbEmpty && !loading" class="card border-0 shadow-sm">
-    <div class="card-header bg-white py-3 border-bottom border-light">
-      <h5 class="card-title mb-0 fw-bold text-dark"><i class="bi bi-arrow-left-right me-2 text-primary"></i>Campaign Budget & Revenue Matrix</h5>
+    <!-- Side-by-side Selectors & Visualizer -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-white py-3 border-bottom border-light">
+        <h5 class="card-title mb-0 fw-bold text-dark"><i class="bi bi-arrow-left-right me-2 text-primary"></i>Side-by-Side Selector Comparison</h5>
+      </div>
+      <div class="card-body">
+        <div class="row g-3 mb-4">
+          <!-- Campaign A Selector -->
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold text-secondary">Compare Campaign A</label>
+            <select class="form-select" [(ngModel)]="selectedCampAId" (change)="onCampaignSelect('A')">
+              <option *ngFor="let c of campaigns" [value]="c.campaignId" [disabled]="c.campaignId.toString() === selectedCampBId">
+                {{ c.campaignName }} ({{ c.marketingChannel }})
+              </option>
+            </select>
+          </div>
+          <!-- Campaign B Selector -->
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold text-secondary">Against Campaign B</label>
+            <select class="form-select" [(ngModel)]="selectedCampBId" (change)="onCampaignSelect('B')">
+              <option *ngFor="let c of campaigns" [value]="c.campaignId" [disabled]="c.campaignId.toString() === selectedCampAId">
+                {{ c.campaignName }} ({{ c.marketingChannel }})
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Comparison Details Grid -->
+        <div class="row align-items-center" *ngIf="campA && campB">
+          <!-- Campaign A Detailed Card -->
+          <div class="col-md-5">
+            <div class="card bg-light border-0 p-3">
+              <h5 class="fw-bold text-primary mb-3 text-truncate">{{ campA.campaignName }}</h5>
+              <ul class="list-group list-group-flush bg-transparent">
+                <li class="list-group-item bg-transparent d-flex justify-content-between">
+                  <span class="text-secondary small">Channel:</span>
+                  <span class="fw-semibold">{{ campA.marketingChannel }}</span>
+                </li>
+                <li class="list-group-item bg-transparent d-flex justify-content-between">
+                  <span class="text-secondary small">Budget:</span>
+                  <span class="fw-semibold" [class.text-success]="campA.budget > campB.budget">{{ campA.budget | currency }}</span>
+                </li>
+                <li class="list-group-item bg-transparent d-flex justify-content-between">
+                  <span class="text-secondary small">Spend:</span>
+                  <span class="fw-semibold">{{ campA.spend | currency }}</span>
+                </li>
+                <li class="list-group-item bg-transparent d-flex justify-content-between">
+                  <span class="text-secondary small">Revenue:</span>
+                  <span class="fw-semibold" [class.text-success]="campA.revenue > campB.revenue">{{ campA.revenue | currency }}</span>
+                </li>
+                <li class="list-group-item bg-transparent d-flex justify-content-between">
+                  <span class="text-secondary small">ROI:</span>
+                  <span class="fw-bold" [class.text-success]="campA.roi > campB.roi">{{ campA.roi | percent:'1.1-2' }}</span>
+                </li>
+                <li class="list-group-item bg-transparent d-flex justify-content-between">
+                  <span class="text-secondary small">ROAS:</span>
+                  <span class="fw-bold" [class.text-success]="campA.roas > campB.roas">{{ campA.roas | number:'1.2-2' }}x</span>
+                </li>
+                <li class="list-group-item bg-transparent d-flex justify-content-between">
+                  <span class="text-secondary small">CTR:</span>
+                  <span class="fw-semibold" [class.text-success]="campA.ctr > campB.ctr">{{ campA.ctr | percent:'1.2-2' }}</span>
+                </li>
+                <li class="list-group-item bg-transparent d-flex justify-content-between">
+                  <span class="text-secondary small">Conversion Rate:</span>
+                  <span class="fw-semibold" [class.text-success]="campA.conversionRate > campB.conversionRate">{{ campA.conversionRate | percent:'1.2-2' }}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Vs Divider -->
+          <div class="col-md-2 text-center my-3 my-md-0">
+            <span class="bg-primary text-white rounded-circle fs-5 fw-bold d-inline-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+              VS
+            </span>
+          </div>
+
+          <!-- Campaign B Detailed Card -->
+          <div class="col-md-5">
+            <div class="card bg-light border-0 p-3">
+              <h5 class="fw-bold text-success mb-3 text-truncate">{{ campB.campaignName }}</h5>
+              <ul class="list-group list-group-flush bg-transparent">
+                <li class="list-group-item bg-transparent d-flex justify-content-between">
+                  <span class="text-secondary small">Channel:</span>
+                  <span class="fw-semibold">{{ campB.marketingChannel }}</span>
+                </li>
+                <li class="list-group-item bg-transparent d-flex justify-content-between">
+                  <span class="text-secondary small">Budget:</span>
+                  <span class="fw-semibold" [class.text-success]="campB.budget > campA.budget">{{ campB.budget | currency }}</span>
+                </li>
+                <li class="list-group-item bg-transparent d-flex justify-content-between">
+                  <span class="text-secondary small">Spend:</span>
+                  <span class="fw-semibold">{{ campB.spend | currency }}</span>
+                </li>
+                <li class="list-group-item bg-transparent d-flex justify-content-between">
+                  <span class="text-secondary small">Revenue:</span>
+                  <span class="fw-semibold" [class.text-success]="campB.revenue > campA.revenue">{{ campB.revenue | currency }}</span>
+                </li>
+                <li class="list-group-item bg-transparent d-flex justify-content-between">
+                  <span class="text-secondary small">ROI:</span>
+                  <span class="fw-bold" [class.text-success]="campB.roi > campA.roi">{{ campB.roi | percent:'1.1-2' }}</span>
+                </li>
+                <li class="list-group-item bg-transparent d-flex justify-content-between">
+                  <span class="text-secondary small">ROAS:</span>
+                  <span class="fw-bold" [class.text-success]="campB.roas > campA.roas">{{ campB.roas | number:'1.2-2' }}x</span>
+                </li>
+                <li class="list-group-item bg-transparent d-flex justify-content-between">
+                  <span class="text-secondary small">CTR:</span>
+                  <span class="fw-semibold" [class.text-success]="campB.ctr > campA.ctr">{{ campB.ctr | percent:'1.2-2' }}</span>
+                </li>
+                <li class="list-group-item bg-transparent d-flex justify-content-between">
+                  <span class="text-secondary small">Conversion Rate:</span>
+                  <span class="fw-semibold" [class.text-success]="campB.conversionRate > campA.conversionRate">{{ campB.conversionRate | percent:'1.2-2' }}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="card-body p-0">
-      <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0 text-center">
-          <thead>
-            <tr class="text-start">
-              <th class="text-start">Campaign Name</th>
-              <th>Spend</th>
-              <th>Revenue</th>
-              <th>ROI</th>
-              <th>Conversion Rate</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let c of campaigns" [class.table-success]="c.roi === highestRoi" [class.table-danger]="c.roi === lowestRoi">
-              <td class="fw-bold text-start">{{ c.campaignName }}</td>
-              <td>{{ c.spend | currency }}</td>
-              <td>{{ c.revenue | currency }}</td>
-              <td class="fw-bold">{{ c.roi | percent:'1.1-2' }}</td>
-              <td>{{ c.conversionRate | percent:'1.2-2' }}</td>
-            </tr>
-          </tbody>
-        </table>
+
+    <!-- Comparative Table Grid -->
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white py-3 border-bottom border-light">
+        <h5 class="card-title mb-0 fw-bold text-dark"><i class="bi bi-grid-3x3-gap-fill me-2 text-primary"></i>Benchmark Comparison Table</h5>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Campaign Name</th>
+                <th>Channel</th>
+                <th>Spend</th>
+                <th>Revenue</th>
+                <th>ROI</th>
+                <th>Conversion Rate</th>
+                <th>Comparison Benchmarks</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let c of campaigns"
+                  [class.table-success]="c.campaignId === highestRoiCamp?.campaignId"
+                  [class.table-danger]="c.campaignId === lowestRoiCamp?.campaignId">
+                <td class="fw-bold">{{ c.campaignName }}</td>
+                <td>{{ c.marketingChannel }}</td>
+                <td>{{ c.spend | currency }}</td>
+                <td>{{ c.revenue | currency }}</td>
+                <td class="fw-bold">{{ c.roi | percent:'1.1-2' }}</td>
+                <td>{{ c.conversionRate | percent:'1.2-2' }}</td>
+                <td>
+                  <span *ngIf="c.campaignId === highestRevenueCamp?.campaignId" class="badge bg-primary me-1">Highest Revenue</span>
+                  <span *ngIf="c.campaignId === highestRoiCamp?.campaignId" class="badge bg-success me-1">Highest ROI</span>
+                  <span *ngIf="c.campaignId === highestConversionCamp?.campaignId" class="badge bg-info text-dark me-1">Highest Conversion</span>
+                  <span *ngIf="c.campaignId === lowestRoiCamp?.campaignId" class="badge bg-danger">Lowest ROI</span>
+                  <span *ngIf="c.campaignId !== highestRevenueCamp?.campaignId && c.campaignId !== highestRoiCamp?.campaignId && c.campaignId !== highestConversionCamp?.campaignId && c.campaignId !== lowestRoiCamp?.campaignId" class="text-muted small">-</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>

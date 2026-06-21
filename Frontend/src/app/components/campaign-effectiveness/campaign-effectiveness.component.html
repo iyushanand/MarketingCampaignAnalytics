@@ -1,8 +1,8 @@
 <div class="container-fluid py-4">
   <div class="row mb-4 align-items-center">
     <div class="col">
-      <h2 class="h3 mb-0 text-slate-800"><i class="bi bi-shield-check me-2 text-primary"></i>Campaign Effectiveness</h2>
-      <p class="text-muted mb-0 small">Assess user response behaviors and returns to identify optimized campaign channels</p>
+      <h2 class="h3 mb-0 text-slate-800"><i class="bi bi-shield-check me-2 text-primary"></i>Campaign Effectiveness Analysis</h2>
+      <p class="text-muted mb-0 small">Assess user response behaviors, conversion rates, and effectiveness benchmarks</p>
     </div>
   </div>
 
@@ -23,7 +23,7 @@
     <div class="mt-3 text-secondary">Loading campaign effectiveness...</div>
   </div>
 
-  <!-- Effectiveness Card -->
+  <!-- Effectiveness Table Card -->
   <div *ngIf="!isDbEmpty && !loading" class="card border-0 shadow-sm">
     <div class="card-header bg-white py-3 border-bottom border-light">
       <h5 class="card-title mb-0 fw-bold text-dark"><i class="bi bi-shield-check me-2 text-success"></i>Campaign Measurement Matrix</h5>
@@ -39,7 +39,9 @@
               <th>ROI</th>
               <th>Conversion Rate</th>
               <th>Response Rate</th>
-              <th class="text-center">Performance Indicator</th>
+              <th>Status</th>
+              <th class="text-center">Effectiveness Rating</th>
+              <th class="text-center">Benchmarks</th>
             </tr>
           </thead>
           <tbody>
@@ -52,16 +54,20 @@
               </td>
               <td>{{ c.conversionRate | percent:'1.2-2' }}</td>
               <td>{{ c.responseRate | percent:'1.2-2' }}</td>
+              <td>
+                <span class="badge" [class.bg-success]="c.status === 'Completed'" [class.bg-info]="c.status === 'Active'">
+                  {{ c.status }}
+                </span>
+              </td>
               <td class="text-center">
-                <span *ngIf="c.isBestRoi" class="badge bg-success px-3 py-2 rounded-pill small me-1">
-                  <i class="bi bi-arrow-up-circle-fill me-1"></i>Best ROI
+                <span class="badge px-3 py-2 rounded" [ngClass]="getEffectivenessBadge(c.roi).class">
+                  {{ getEffectivenessBadge(c.roi).text }}
                 </span>
-                <span *ngIf="c.isWorstRoi" class="badge bg-danger px-3 py-2 rounded-pill small me-1">
-                  <i class="bi bi-arrow-down-circle-fill me-1"></i>Worst ROI
-                </span>
-                <span *ngIf="c.isBestResponse" class="badge bg-info text-dark px-3 py-2 rounded-pill small">
-                  <i class="bi bi-hand-thumbs-up-fill me-1"></i>Highest Response
-                </span>
+              </td>
+              <td class="text-center">
+                <span *ngIf="c.isBestRoi" class="badge bg-success px-2 py-1 rounded-pill small me-1">Best ROI</span>
+                <span *ngIf="c.isWorstRoi" class="badge bg-danger px-2 py-1 rounded-pill small me-1">Worst ROI</span>
+                <span *ngIf="c.isBestResponse" class="badge bg-info text-dark px-2 py-1 rounded-pill small">Highest Response</span>
                 <span *ngIf="!c.isBestRoi && !c.isWorstRoi && !c.isBestResponse" class="text-muted small">-</span>
               </td>
             </tr>
