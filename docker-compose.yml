@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: mca_database
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=YourStrongPassword123!
+    ports:
+      - "1433:1433"
+    volumes:
+      - mca_db_data:/var/opt/mssql
+
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    container_name: mca_backend
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=database;Database=MarketingCampaignAnalytics;User Id=sa;Password=YourStrongPassword123!;Encrypt=False;
+    ports:
+      - "5224:5224"
+    depends_on:
+      - database
+
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    container_name: mca_frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+
+volumes:
+  mca_db_data:
