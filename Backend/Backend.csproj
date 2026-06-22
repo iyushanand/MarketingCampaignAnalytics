@@ -16,4 +16,11 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Copy python scripts, model artifacts, and metrics to output and publish folders -->
+    <None Include="Analytics\**\*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <!-- Link and copy the main Kaggle dataset to data/marketing_campaign.csv in output and publish folders -->
+    <None Include="..\data\marketing_campaign.csv" Link="data\marketing_campaign.csv" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
