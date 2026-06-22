@@ -45,7 +45,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularClient", corsBuilder =>
     {
-        corsBuilder.WithOrigins("http://localhost:4200")
+        corsBuilder.SetIsOriginAllowed(origin => true)
                    .AllowAnyMethod()
                    .AllowAnyHeader()
                    .AllowCredentials();
@@ -67,16 +67,15 @@ builder.Services.AddSwaggerGen(c =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Marketing Campaign Analytics API v1");
-    });
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Marketing Campaign Analytics API v1");
+});
 
-    // Run database migrations on startup in development
-    using var scope = app.Services.CreateScope();
+// Run database migrations on startup
+using (var scope = app.Services.CreateScope())
+{
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     await DbInitializer.InitializeAsync(dbContext);
 }

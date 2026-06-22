@@ -28,7 +28,9 @@ export interface ApiResponseWrapper<T> {
   providedIn: 'root'
 })
 export class ApiService {
-  private apiUrl = 'http://localhost:5224/api'; // Correct ASP.NET Core port from Phase 3 logs
+  private apiUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:5224/api'
+    : 'https://mca-backend-iyush-crbgbgewfjc4fkam.southindia-01.azurewebsites.net/api';
 
   constructor(private http: HttpClient) { }
 
