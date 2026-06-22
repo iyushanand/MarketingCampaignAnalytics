@@ -69,6 +69,24 @@ namespace Backend.Services
             {
                 try
                 {
+                    // 1. Bootstrap pip if not present
+                    using (var bootstrapProc = Process.Start(new ProcessStartInfo
+                    {
+                        FileName = _pythonPath,
+                        Arguments = "-m ensurepip --default-pip",
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    }))
+                    {
+                        if (bootstrapProc != null)
+                        {
+                            await bootstrapProc.WaitForExitAsync();
+                        }
+                    }
+
+                    // 2. Install required packages
                     var packages = new[] { "pandas", "numpy", "scikit-learn", "scipy", "statsmodels", "openpyxl", "reportlab", "joblib" };
                     var args = $"-m pip install --user {string.Join(" ", packages)}";
                     

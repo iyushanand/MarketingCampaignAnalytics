@@ -1,5 +1,12 @@
 import sys
 import os
+import site
+
+# Force inclusion of user site-packages in case it's disabled by the hosting server
+user_site = site.getusersitepackages()
+if os.path.exists(user_site) and user_site not in sys.path:
+    sys.path.insert(0, user_site)
+
 import json
 import datetime
 import warnings
