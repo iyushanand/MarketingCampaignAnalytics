@@ -12,11 +12,94 @@ namespace Backend.Services
     /// </summary>
     public class PythonRunner
     {
-        private readonly string _pythonPath;
+        private string _pythonPath;
+        private static bool _dependenciesChecked = false;
 
         public PythonRunner(IConfiguration configuration)
         {
-            _pythonPath = configuration["PythonSettings:PythonPath"] ?? "python";
+            var configPath = configuration["PythonSettings:PythonPath"] ?? "python";
+            _pythonPath = ResolvePythonPath(configPath);
+            EnsureDependenciesAsync();
+        }
+
+        private string ResolvePythonPath(string configPath)
+        {
+            if (CanExecute(configPath))
+            {
+                return configPath;
+            }
+
+            if (!OperatingSystem.IsWindows())
+            {
+                if (CanExecute("python3")) return "python3";
+                if (CanExecute("python")) return "python";
+            }
+            
+            return configPath;
+        }
+
+        private bool CanExecute(string command)
+        {
+            try
+            {
+                using var process = Process.Start(new ProcessStartInfo
+                {
+                    FileName = command,
+                    Arguments = "--version",
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                });
+                process?.WaitForExit();
+                return process != null && process.ExitCode == 0;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private void EnsureDependenciesAsync()
+        {
+            if (_dependenciesChecked) return;
+            _dependenciesChecked = true;
+
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var packages = new[] { "pandas", "numpy", "scikit-learn", "scipy", "statsmodels", "openpyxl", "reportlab", "joblib" };
+                    var args = $"-m pip install --user {string.Join(" ", packages)}";
+                    
+                    var processStartInfo = new ProcessStartInfo
+                    {
+                        FileName = _pythonPath,
+                        Arguments = args,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
+
+                    using var process = Process.Start(processStartInfo);
+                    if (process != null)
+                    {
+                        await process.WaitForExitAsync();
+                        string error = await process.StandardError.ReadToEndAsync();
+                        string output = await process.StandardOutput.ReadToEndAsync();
+                        Console.WriteLine($"Python Dependency Installer Output: {output}");
+                        if (process.ExitCode != 0)
+                        {
+                            Console.WriteLine($"Python Dependency Installer Error: {error}");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to auto-verify or install Python dependencies: {ex.Message}");
+                }
+            });
         }
 
         /// <summary>
